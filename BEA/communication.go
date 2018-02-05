@@ -1,12 +1,13 @@
 package BEA
 
 import (
-	"ISO8583"
-	"TLV"
 	"errors"
 	"fmt"
 	"net"
 	"time"
+
+	"github.com/zhulingbiezhi/sdkOld/ISO8583"
+	"github.com/zhulingbiezhi/sdkOld/TLV"
 )
 
 //和后台通信发送授权请求报文并接收授权响应报文
