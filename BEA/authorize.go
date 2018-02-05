@@ -5,7 +5,7 @@ type AuthorizeTransaction struct {
 	BaseElement
 }
 
-func NewAuthorize(trans *TransactionData, config *Config) *AuthorizeTransaction {
+func NewAuthorize(trans *TransactionData, config *Config) (*AuthorizeTransaction, error) {
 	fieldMap := map[EntryMode][]uint8{
 		INSERT:   {0, 2, 3, 4, 11, 14, 22, 23, 24, 25, 35, 41, 42, 55, 62},
 		SWIPE:    {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 62},
@@ -20,7 +20,7 @@ func NewAuthorize(trans *TransactionData, config *Config) *AuthorizeTransaction 
 			transData: trans,
 			config:    config,
 		},
-	}
+	}, nil
 }
 
 func (auth *AuthorizeTransaction) Valid() error {
@@ -33,6 +33,10 @@ func (auth *AuthorizeTransaction) Valid() error {
 		auth.transData.CardExpireDate,
 		auth.transData.Track2,
 	)
+}
+
+func (auth *AuthorizeTransaction) Name() string {
+	return "Authorize"
 }
 
 func (auth *AuthorizeTransaction) SetFields() {

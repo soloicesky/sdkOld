@@ -7,9 +7,6 @@ import (
 	"fmt"
 
 	"github.com/zhulingbiezhi/sdkOld/ISO8583"
-	"github.com/zhulingbiezhi/sdkOld/TLV"
-
-	//	"golang.org/x/crypto/pbkdf2"
 )
 
 //加密ISO8583消息
@@ -25,9 +22,6 @@ func encryptISO8583Message(msg []byte) []byte {
 	var tripleDESKey []byte
 	tripleDESKey = append(tripleDESKey, key[:16]...)
 	tripleDESKey = append(tripleDESKey, key[:8]...)
-	fmt.Println("tripleDESKey ", ISO8583.Base16Encode(tripleDESKey))
-
-	fmt.Printf("msg-----%X")
 	encryptedMsg, err := TripleDesEncrypt(msg, tripleDESKey)
 	if err != nil {
 		fmt.Println("TripleEcbDesEncrypt error :", err.Error())

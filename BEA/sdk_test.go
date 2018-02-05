@@ -1,287 +1,179 @@
 package BEA
 
 import (
-	"ISO8583"
-	"TLV"
 	"fmt"
 	"testing"
+
+	//	"github.com/zhulingbiezhi/sdkOld/ISO8583"
+	//	"github.com/zhulingbiezhi/sdkOld/TLV"
 )
 
-func TestBEA(t *testing.T) {
-	var transData TransactionData
-	// BEA.Init()
-
-	transData.TransId = "000001"
-	transData.Invoice = "000001"
-	transData.TransDate = "1221"
-	transData.TransTime = "164030"
-	// transData.TransType = SALE
-	//transData.CurrencyCode = "0344"
-	transData.MerchantId = "000015204000099"
-	transData.TerminalId = "63150001"
-	transData.Pan = ""
-	transData.PanSeqNo = ""
-	transData.CardExpireDate = "2512"
-	transData.Track1 = ""
-	transData.Track2 = "5413330056003578D251210100062001602"
-	transData.PosEntryMode = "INSERT"
-
-	iccData := make(map[string]string, 0)
-	TLV.ParseConstructTLVMsg(ISO8583.Base16Decode("5F2A020344820200008407A0000000041010950500000000009A031712139B0200009C01009F02060000000066369F03060000000000009F090200029F1A0203449F1E0831323334353637389F3303E0B8C89F3501229F360200019F370485A04EA89F4104000000209F6002C3DE9F6102391C9F62060000000000389F6401059F63060000000007C69F650200E09F6701059F6602071E9F6A04000000609F6B125413330056003578D251210100062001602F"), iccData)
-
-	transData.IccRelatedData = iccData
-	var config Config
-	config.TPDU = "7000280000"
-	config.EDS = "0003000A00F000"
-	config.Host = "192.168.22.188:8081"
-	fmt.Printf("%+v\n", transData)
-	//transData, _ = Sale(transData, config)
+var IccRelatedData = map[string]string{
+	"50":   "5649534120435245444954",
+	"57":   "4761739001010432D22122011631141689",
+	"81":   "0000E484",
+	"82":   "5C00",
+	"84":   "A0000000031010",
+	"87":   "01",
+	"90":   "3C96F7658FBC29A202F19146BDE92166B0F6221BBCCB02E326710B9E229D16FAE9AD0C874C0685916E19F0E32693EE201BCE2359509A6D6572F8EC3FC373126B343F9CB8153D61B7EAB2D42DE19D56083185A03DD14C268D40DF0835C55EABFA38ED28BCE42CD0013DA94F800518B753C246EFFBA08FD2029BAD5DFCF0DAF07B7D801C465FFD252C70B92153B330D95DCA2FA1FAAE2D0168A4EA8B475CD805DC32AA964C17BFCD2CD5D0309AB0EA761B",
+	"92":   "50DA20DDA8953B693FED84366831BA1EEA97F78F792ACF8CB98FDF0149A7B78FDA1C4967",
+	"93":   "52078E99417C94F03F9BBE0D67995AD5244B171FA6B05EEF12B56D0F363EE71808451406F5667426875D18027140228E127258A2011D937539F11770B033E2CD26E47E1FF7FD487688C084A0617D3C189BD164030A6942C5C0D8937E2EAAAF84FFD69AFB550196CD5C935E8F8708156E25074D5B3E6D3365D921B5217E79D3F53666E48C566994D7D69C57A7BC5C770999978BA9315DE223880E3A313426D500D1130B2A474BD9F133A8C922A0452664",
+	"94":   "080101001001030018010201",
+	"95":   "0280008000",
+	"9F37": "595595A7",
+	"9F34": "1E0300",
+	"9F02": "000000058500",
+	"9F08": "008D",
+	"9F26": "5538565E1DF18CD4",
+	"6F":   "8407A0000000031010A526500B56495341204352454449549F120F4352454449544F20444520564953418701019F110101",
+	"A5":   "500B56495341204352454449549F120F4352454449544F20444520564953418701019F110101",
+	"5F25": "090701",
+	"9F40": "6000F0A001",
+	"9F1E": "3132333435363738",
+	"9B":   "E800",
+	"8F":   "92",
+	"5F2A": "0344",
+	"9F03": "000000000000",
+	"5F24": "221231",
+	"9F07": "FF00",
+	"9F41": "00000000",
+	"9F21": "120017",
+	"9F1A": "0344",
+	"9F04": "00000000",
+	"8C":   "9F02069F03069F1A0295055F2A029A039C019F3704",
+	"9F0F": "F040009800",
+	"8D":   "8A029F02069F03069F1A0295055F2A029A039C019F3704",
+	"4F":   "A0000000031010",
+	"9F11": "01",
+	"9F45": "DAC5",
+	"9F09": "0096",
+	"9F1F": "313633313138393030343136303030303030",
+	"9F1B": "00003A98",
+	"5F28": "0840",
+	"9F35": "22",
+	"9A":   "180205",
+	"9F36": "0001",
+	"9C":   "00",
+	"9F0E": "0010000000",
+	"8E":   "00000000000000001E0302031F00",
+	"9F12": "4352454449544F2044452056495341",
+	"9F42": "0840",
+	"9F33": "E0B8C8",
+	"9F10": "06010A03A00000",
+	"5A":   "4761739001010432",
+	"9F32": "03",
+	"9F0D": "F040008800",
+	"9F06": "A0000000031010",
+	"9F27": "80",
 }
 
-func getConfig() Config {
-	return Config{
-		TPDU:    "7000280000",
-		EDS:     "0003000A00F000",
-		Host:    "192.168.22.188:8081",
-		TimeOut: 30,
+func TestAuthorize(t *testing.T) {
+	fmt.Println("---------------Start TestAuthorize-------------")
+	transData := &TransactionData{
+		TransType:      KindPreAuthorize,
+		Amount:         "1",
+		TransId:        "00001",
+		Pan:            "2512",
+		CardExpireDate: "",
+		Track2:         "5413330056003578D251210100062001602",
+		PosEntryMode:   "SWIPE",
+		IccRelatedData: IccRelatedData,
 	}
-}
-
-/*
-func TestPreAuthorization(t *testing.T) {
-	fmt.Println("------------TestPreAuthorization start-----------------")
-	var transData TransactionData
-	transData.TransId = "000001"
-	// transData.TransType = PREAUTH
-	transData.Track2 = "5413330056003578D251210100062001602"
-	transData.PosEntryMode = "INSERT"
-	transData.MerchantId = "000015204000099"
-	transData.TerminalId = "63150001"
-	transData.Pan = ""
-	transData.PanSeqNo = ""
-	transData.CardExpireDate = "2512"
-	transData.Track1 = ""
-	transData.Track2 = "5413330056003578D251210100062001602"
-	transData.PosEntryMode = "INSERT"
-
-	iccData := make(map[string]string, 0)
-	TLV.ParseConstructTLVMsg(ISO8583.Base16Decode("5F2A020344820200008407A0000000041010950500000000009A031712139B0200009C01009F02060000000066369F03060000000000009F090200029F1A0203449F1E0831323334353637389F3303E0B8C89F3501229F360200019F370485A04EA89F4104000000209F6002C3DE9F6102391C9F62060000000000389F6401059F63060000000007C69F650200E09F6701059F6602071E9F6A04000000609F6B125413330056003578D251210100062001602F"), iccData)
-
-	transData.IccRelatedData = iccData
-	fmt.Print("request data:\n ", transData.FormJson())
-	replyData, err := PreAuthorization(transData, getConfig())
-
-	fmt.Print("%v", err)
-	fmt.Print("reply data:\n ", replyData.FormJson())
-	fmt.Println("------------TestPreAuthorization end-----------------")
-}
-
-func TestPostPreAuthorization(t *testing.T) {
-	fmt.Println("------------TestPostPreAuthorization start-----------------")
-	var transData TransactionData
-	transData.TransId = "000001"
-	// transData.TransType = PREAUTHCOMPLETION
-	transData.Track2 = "5413330056003578D251210100062001602"
-	transData.PosEntryMode = "INSERT"
-	transData.MerchantId = "000015204000099"
-	transData.TerminalId = "63150001"
-	transData.Pan = ""
-	transData.PanSeqNo = ""
-	transData.CardExpireDate = "2512"
-	transData.Track1 = ""
-	transData.Track2 = "5413330056003578D251210100062001602"
-	transData.PosEntryMode = "INSERT"
-
-	iccData := make(map[string]string, 0)
-	TLV.ParseConstructTLVMsg(ISO8583.Base16Decode("5F2A020344820200008407A0000000041010950500000000009A031712139B0200009C01009F02060000000066369F03060000000000009F090200029F1A0203449F1E0831323334353637389F3303E0B8C89F3501229F360200019F370485A04EA89F4104000000209F6002C3DE9F6102391C9F62060000000000389F6401059F63060000000007C69F650200E09F6701059F6602071E9F6A04000000609F6B125413330056003578D251210100062001602F"), iccData)
-
-	transData.IccRelatedData = iccData
-	fmt.Print("request data:\n ", transData.FormJson())
-	replyData, err := PreAuthCompletion(transData, getConfig())
-	fmt.Print("%v", err)
-	fmt.Print("reply data:\n ", replyData.FormJson())
-	fmt.Println("------------TestPostPreAuthorization end-----------------")
-}
-
-func TestRefund(t *testing.T) {
-	fmt.Println("------------TestRefund start-----------------")
-	var transData TransactionData
-	transData.TransId = "000001"
-	transData.Track2 = "5413330056003578D251210100062001602"
-	transData.PosEntryMode = "INSERT"
-	transData.MerchantId = "000015204000099"
-	transData.TerminalId = "63150001"
-	transData.Pan = ""
-	transData.PanSeqNo = ""
-	transData.CardExpireDate = "2512"
-	transData.Track1 = ""
-	transData.Track2 = "5413330056003578D251210100062001602"
-	transData.PosEntryMode = "INSERT"
-
-	iccData := make(map[string]string, 0)
-	TLV.ParseConstructTLVMsg(ISO8583.Base16Decode("5F2A020344820200008407A0000000041010950500000000009A031712139B0200009C01009F02060000000066369F03060000000000009F090200029F1A0203449F1E0831323334353637389F3303E0B8C89F3501229F360200019F370485A04EA89F4104000000209F6002C3DE9F6102391C9F62060000000000389F6401059F63060000000007C69F650200E09F6701059F6602071E9F6A04000000609F6B125413330056003578D251210100062001602F"), iccData)
-
-	transData.IccRelatedData = iccData
-	fmt.Print("request data:\n ", transData.FormJson())
-	replyData, err := Refund(transData, getConfig())
-	fmt.Print("%v", err)
-	fmt.Print("reply data:\n ", replyData.FormJson())
-	fmt.Println("------------TestRefund end-----------------")
+	fmt.Printf("request data: %s", transData.FormJson())
+	resp, err := DoRequest(transData, getConfig())
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Printf("response data: %s", resp.FormJson())
+	fmt.Println("---------------Success TestAuthorize-------------")
 }
 
 func TestSales(t *testing.T) {
-	fmt.Println("------------TestSales start-----------------")
-	var transData TransactionData
-	transData.TransId = "000001"
-	transData.Track2 = "5413330056003578D251210100062001602"
-	transData.PosEntryMode = "INSERT"
-	transData.MerchantId = "000015204000099"
-	transData.TerminalId = "63150001"
-	transData.Pan = ""
-	transData.PanSeqNo = ""
-	transData.CardExpireDate = "2512"
-	transData.Track1 = ""
-	transData.Track2 = "5413330056003578D251210100062001602"
-	transData.PosEntryMode = "INSERT"
-
-	iccData := make(map[string]string, 0)
-	TLV.ParseConstructTLVMsg(ISO8583.Base16Decode("5F2A020344820200008407A0000000041010950500000000009A031712139B0200009C01009F02060000000066369F03060000000000009F090200029F1A0203449F1E0831323334353637389F3303E0B8C89F3501229F360200019F370485A04EA89F4104000000209F6002C3DE9F6102391C9F62060000000000389F6401059F63060000000007C69F650200E09F6701059F6602071E9F6A04000000609F6B125413330056003578D251210100062001602F"), iccData)
-
-	transData.IccRelatedData = iccData
-	fmt.Print("request data:\n ", transData.FormJson())
-	replyData, err := Sale(transData, getConfig())
-	fmt.Print("%v", err)
-	fmt.Print("reply data:\n ", replyData.FormJson())
-	fmt.Println("------------TestSales end-----------------")
+	fmt.Println("---------------Start TestSales-------------")
+	transData := &TransactionData{
+		TransType: KindSale,
+	}
+	fmt.Printf("request data: %s", transData.FormJson())
+	resp, err := DoRequest(transData, getConfig())
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Printf("response data: %s", resp.FormJson())
+	fmt.Println("---------------Success TestSales-------------")
 }
 
-func TestVoid_PreAuthorization(t *testing.T) {
-	fmt.Println("------------TestVoid_PreAuthorization start-----------------")
-	var transData TransactionData
-	transData.TransId = "000001"
-	transData.Track2 = "5413330056003578D251210100062001602"
-	transData.PosEntryMode = "INSERT"
-	transData.MerchantId = "000015204000099"
-	transData.TerminalId = "63150001"
-	transData.Pan = ""
-	transData.PanSeqNo = ""
-	transData.CardExpireDate = "2512"
-	transData.Track1 = ""
-	transData.Track2 = "5413330056003578D251210100062001602"
-	transData.PosEntryMode = "INSERT"
-
-	iccData := make(map[string]string, 0)
-	TLV.ParseConstructTLVMsg(ISO8583.Base16Decode("5F2A020344820200008407A0000000041010950500000000009A031712139B0200009C01009F02060000000066369F03060000000000009F090200029F1A0203449F1E0831323334353637389F3303E0B8C89F3501229F360200019F370485A04EA89F4104000000209F6002C3DE9F6102391C9F62060000000000389F6401059F63060000000007C69F650200E09F6701059F6602071E9F6A04000000609F6B125413330056003578D251210100062001602F"), iccData)
-
-	transData.IccRelatedData = iccData
-	fmt.Print("request data:\n ", transData.FormJson())
-	replyData, err := VoidPreAuth(transData, getConfig())
-	fmt.Print("%v", err)
-	fmt.Print("reply data:\n ", replyData.FormJson())
-	fmt.Println("------------TestVoid_PreAuthorization end-----------------")
+func TestCapture(t *testing.T) {
+	fmt.Println("---------------Start TestCapture-------------")
+	transData := &TransactionData{
+		TransType: KindPreAuthCompletion,
+	}
+	fmt.Printf("request data: %s", transData.FormJson())
+	resp, err := DoRequest(transData, getConfig())
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Printf("response data: %s", resp.FormJson())
+	fmt.Println("---------------Success TestCapture-------------")
 }
 
-func TestVoid_PostPreAuthorization(t *testing.T) {
-	fmt.Println("------------TestVoid_PostPreAuthorization start-----------------")
-	var transData TransactionData
-	transData.TransId = "000001"
-	transData.Track2 = "5413330056003578D251210100062001602"
-	transData.PosEntryMode = "INSERT"
-	transData.MerchantId = "000015204000099"
-	transData.TerminalId = "63150001"
-	transData.Pan = ""
-	transData.PanSeqNo = ""
-	transData.CardExpireDate = "2512"
-	transData.Track1 = ""
-	transData.Track2 = "5413330056003578D251210100062001602"
-	transData.PosEntryMode = "INSERT"
-
-	iccData := make(map[string]string, 0)
-	TLV.ParseConstructTLVMsg(ISO8583.Base16Decode("5F2A020344820200008407A0000000041010950500000000009A031712139B0200009C01009F02060000000066369F03060000000000009F090200029F1A0203449F1E0831323334353637389F3303E0B8C89F3501229F360200019F370485A04EA89F4104000000209F6002C3DE9F6102391C9F62060000000000389F6401059F63060000000007C69F650200E09F6701059F6602071E9F6A04000000609F6B125413330056003578D251210100062001602F"), iccData)
-
-	transData.IccRelatedData = iccData
-	fmt.Print("request data:\n ", transData.FormJson())
-	replyData, err := VoidPreAuthCompletion(transData, getConfig())
-	fmt.Print("%v", err)
-	fmt.Print("reply data:\n ", replyData.FormJson())
-	fmt.Println("------------TestVoid_PostPreAuthorization end-----------------")
+func TestRefund(t *testing.T) {
+	fmt.Println("---------------Start TestRefund-------------")
+	transData := &TransactionData{
+		TransType: KindRefund,
+	}
+	fmt.Printf("request data: %s", transData.FormJson())
+	resp, err := DoRequest(transData, getConfig())
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Printf("response data: %s", resp.FormJson())
+	fmt.Println("---------------Success TestRefund-------------")
 }
 
-func TestVoid_Refund(t *testing.T) {
-	fmt.Println("------------TestVoidRefund start-----------------")
-	var transData TransactionData
-	transData.TransId = "000001"
-	transData.Track2 = "5413330056003578D251210100062001602"
-	transData.PosEntryMode = "INSERT"
-	transData.MerchantId = "000015204000099"
-	transData.TerminalId = "63150001"
-	transData.Pan = ""
-	transData.PanSeqNo = ""
-	transData.CardExpireDate = "2512"
-	transData.Track1 = ""
-	transData.Track2 = "5413330056003578D251210100062001602"
-	transData.PosEntryMode = "INSERT"
-
-	iccData := make(map[string]string, 0)
-	TLV.ParseConstructTLVMsg(ISO8583.Base16Decode("5F2A020344820200008407A0000000041010950500000000009A031712139B0200009C01009F02060000000066369F03060000000000009F090200029F1A0203449F1E0831323334353637389F3303E0B8C89F3501229F360200019F370485A04EA89F4104000000209F6002C3DE9F6102391C9F62060000000000389F6401059F63060000000007C69F650200E09F6701059F6602071E9F6A04000000609F6B125413330056003578D251210100062001602F"), iccData)
-
-	transData.IccRelatedData = iccData
-	fmt.Print("request data:\n ", transData.FormJson())
-	replyData, err := VoidRefund(transData, getConfig())
-	fmt.Print("%v", err)
-	fmt.Print("reply data:\n ", replyData.FormJson())
-	fmt.Println("------------TestVoidRefund end-----------------")
-}
-
-func TestVoid_Sales(t *testing.T) {
-	fmt.Println("------------TestVoid_Sales start-----------------")
-	var transData TransactionData
-	transData.TransId = "000001"
-	transData.Track2 = "5413330056003578D251210100062001602"
-	transData.PosEntryMode = "INSERT"
-	transData.MerchantId = "000015204000099"
-	transData.TerminalId = "63150001"
-	transData.Pan = ""
-	transData.PanSeqNo = ""
-	transData.CardExpireDate = "2512"
-	transData.Track1 = ""
-	transData.Track2 = "5413330056003578D251210100062001602"
-	transData.PosEntryMode = "INSERT"
-
-	iccData := make(map[string]string, 0)
-	TLV.ParseConstructTLVMsg(ISO8583.Base16Decode("5F2A020344820200008407A0000000041010950500000000009A031712139B0200009C01009F02060000000066369F03060000000000009F090200029F1A0203449F1E0831323334353637389F3303E0B8C89F3501229F360200019F370485A04EA89F4104000000209F6002C3DE9F6102391C9F62060000000000389F6401059F63060000000007C69F650200E09F6701059F6602071E9F6A04000000609F6B125413330056003578D251210100062001602F"), iccData)
-
-	transData.IccRelatedData = iccData
-	fmt.Print("request data:\n ", transData.FormJson())
-	replyData, err := VoidSale(transData, getConfig())
-	fmt.Print("%v", err)
-	fmt.Print("reply data:\n ", replyData.FormJson())
-	fmt.Println("------------TestVoid_Sales end-----------------")
+func TestVoid(t *testing.T) {
+	fmt.Println("---------------Start TestVoid-------------")
+	transData := &TransactionData{
+		TransType:      KindVoidSale,
+		OriginalAmount: "",
+	}
+	fmt.Printf("request data: %s", transData.FormJson())
+	resp, err := DoRequest(transData, getConfig())
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Printf("response data: %s", resp.FormJson())
+	fmt.Println("---------------Success TestVoid-------------")
 }
 
 func TestReversal(t *testing.T) {
-	fmt.Println("------------TestReversal start-----------------")
-	var transData TransactionData
-	transData.TransId = "000001"
-	transData.TransType = SALE
-	transData.Track2 = "5413330056003578D251210100062001602"
-	transData.PosEntryMode = "INSERT"
-	transData.MerchantId = "000015204000099"
-	transData.TerminalId = "63150001"
-	transData.Pan = ""
-	transData.PanSeqNo = ""
-	transData.CardExpireDate = "2512"
-	transData.Track1 = ""
-	transData.Track2 = "5413330056003578D251210100062001602"
-	transData.PosEntryMode = "INSERT"
+	fmt.Println("---------------Start TestReversal-------------")
+	transData := &TransactionData{
+		OriginalTransType: KindSale,
+		TransType:         KindReversal,
+		OriginalAmount:    "",
+	}
+	fmt.Printf("request data: %s", transData.FormJson())
+	resp, err := DoRequest(transData, getConfig())
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Printf("response data: %s", resp.FormJson())
+	fmt.Println("---------------Success TestReversal-------------")
+}
 
-	iccData := make(map[string]string, 0)
-	TLV.ParseConstructTLVMsg(ISO8583.Base16Decode("5F2A020344820200008407A0000000041010950500000000009A031712139B0200009C01009F02060000000066369F03060000000000009F090200029F1A0203449F1E0831323334353637389F3303E0B8C89F3501229F360200019F370485A04EA89F4104000000209F6002C3DE9F6102391C9F62060000000000389F6401059F63060000000007C69F650200E09F6701059F6602071E9F6A04000000609F6B125413330056003578D251210100062001602F"), iccData)
-
-	transData.IccRelatedData = iccData
-	fmt.Print("request data:\n ", transData.FormJson())
-	replyData, err := Reversal(transData, getConfig())
-	fmt.Print("%v", err)
-	fmt.Print("reply data:\n ", replyData.FormJson())
-	fmt.Println("------------TestReversal end-----------------")
-}*/
+func getConfig() *Config {
+	return &Config{
+		TPDU:       "7000280000",
+		EDS:        "0003000A00F000",
+		Host:       "bea-uat.bindolabs.com:8081",
+		TimeOut:    120,
+		MerchantId: "000015204000099",
+		TerminalId: "63150001",
+	}
+}
