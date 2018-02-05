@@ -154,19 +154,31 @@ func GetElement(fieldId int) (v string, err error) {
 	@retval msg - 构建好的ISO8583报文
 	@retval err - 错误
 **/
-func PrepareISO8583Message(fdSets map[uint8]string) (msg []byte, err error) {
+func PrepareISO8583Message(fdSets []byte) (msg []byte, err error) {
 	bitmap := make([]byte, 8)
 	vlen := 0
 	message := make([]byte, 1024)
 	offset := 0
 	bitmapOffset := 0
+	var attr Attr
+	var e string
+	var ok bool
 
-	for id, e := range fdSets {
-		attr, ok := fieldAttr[int(id)]
+	//	fmt.Printf("fdSets size:%d\r\n", len(fdSets))
+
+	for _, id := range fdSets {
+		attr, ok = fieldAttr[int(id)]
 
 		if !ok {
 			err = fmt.Errorf("field attr %d not found\r\n", id)
 			return nil, err
+		}
+
+		e, ok = fieldRepo[int(id)]
+
+		if !ok {
+			err = fmt.Errorf("field value %d not found\r\n", id)
+			continue
 		}
 
 		switch attr.format {
@@ -176,7 +188,7 @@ func PrepareISO8583Message(fdSets map[uint8]string) (msg []byte, err error) {
 			vlen = len(e)
 		}
 
-		//		fmt.Printf("[id]:%dvalue:%s\r\n", id, e)
+		fmt.Printf("[id]:%d  value:%s\r\n", id, e)
 		if vlen > attr.maxLen {
 			err = fmt.Errorf("[%d]len invalid, expected:%d, in:%d\r\n", id, attr.maxLen, vlen)
 			continue
@@ -271,7 +283,7 @@ func DecodeISO8583Message(msg []byte, saveData SaveElement, storage interface{})
 	var value string
 	var strlen string
 
-	// fmt.Printf("msg in:%s\r\n", Base16Encode(msg))
+	fmt.Printf("msg in:%s\r\n", Base16Encode(msg))
 	if len(msg) < 10 {
 		return fmt.Errorf("invalid message: %s", Base16Encode(msg))
 	}
@@ -306,7 +318,7 @@ func DecodeISO8583Message(msg []byte, saveData SaveElement, storage interface{})
 					offset += 2
 				}
 
-				// fmt.Printf("id:%d offset:%d-vlen:%d\r\n", id, offset, vlen)
+				fmt.Printf("id:%d offset:%d-vlen:%d\r\n", id, offset, vlen)
 
 				switch attr.format {
 				case N, Z:
@@ -336,6 +348,7 @@ func DecodeISO8583Message(msg []byte, saveData SaveElement, storage interface{})
 					offset += vlen
 
 				default:
+					fmt.Println("not save id: %d ", id)
 				}
 			}
 		}

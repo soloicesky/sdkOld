@@ -10,22 +10,23 @@ import (
 	tlvmap TLV 数据集合
 **/
 func BuildConstructTLVMsg(tlvmap map[string]string) []byte {
-
 	dstMsg := make([]byte, 1)
-
 	for k, v := range tlvmap {
-		dstMsg = append(ISO8583.Base16Decode(k))
-		if len(v) > 127 {
-			dstMsg = append(dstMsg, 0x80)
+		fmt.Printf("tag:%s--val:%s", k, v)
+		dstMsg = append(dstMsg, ISO8583.Base16Decode(k)...)
+		val := ISO8583.Base16Decode(v)
+
+		if len(val) > 127 {
+			dstMsg = append(dstMsg, 0x81)
 		}
 
-		dstMsg = append(dstMsg, byte(len(v)))
+		dstMsg = append(dstMsg, byte(len(val)&0xFF))
 
-		if len(v) > 0 {
-			dstMsg = append(dstMsg, ISO8583.Base16Decode(v)...)
+		if len(val) > 0 {
+			dstMsg = append(dstMsg, val...)
 		}
 	}
-
+	fmt.Println("dstMsg---", string(dstMsg))
 	return dstMsg
 }
 
