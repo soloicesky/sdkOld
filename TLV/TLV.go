@@ -1,8 +1,9 @@
 package TLV
 
 import (
-	"bindolabs/gateway/services/bea/ISO8583"
 	"fmt"
+
+	"github.com/zhulingbiezhi/sdkOld/ISO8583"
 )
 
 /**
