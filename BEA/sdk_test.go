@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestBEA(t *testing.T) {
+func TestSale(t *testing.T) {
 	var transData TransactionData
 	// BEA.Init()
 
@@ -33,7 +33,7 @@ func TestBEA(t *testing.T) {
 	var config Config
 	config.TPDU = "7000280000"
 	config.EDS = "0003000A00F000"
-	config.Host = "192.168.22.188:8081"
+	config.Host = "bea-uat.bindolabs.com:8081"
 	fmt.Printf("%+v\n", transData)
 	//transData, _ = Sale(transData, config)
 }
