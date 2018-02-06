@@ -60,9 +60,21 @@ func validMatch(args ...interface{}) error {
 	for i := 0; i < len(args); i++ {
 		refType := reflect.TypeOf(args[i])
 		refValue := reflect.ValueOf(args[i])
-		if refValue.IsNil() {
-			return fmt.Errorf("the paraments of BEATransaction.%s is empty !", refType.Elem().Name())
+		switch refType.Kind() {
+		case reflect.String:
+			if refValue.String() == "" {
+				return fmt.Errorf("the paraments of BEATransaction.%s is empty !", refType.Elem().Name())
+			}
+		case reflect.Map:
+			if len(refValue.MapKeys()) == 0 {
+				return fmt.Errorf("the paraments of BEATransaction.%s is empty !", refType.Elem().Name())
+			}
+		default:
+			if refValue.IsNil() {
+				return fmt.Errorf("the paraments of BEATransaction.%s is empty !", refType.Elem().Name())
+			}
 		}
+
 	}
 	return nil
 }

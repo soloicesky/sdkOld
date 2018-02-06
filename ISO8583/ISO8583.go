@@ -2,6 +2,7 @@ package ISO8583
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 )
 
@@ -154,23 +155,28 @@ func GetElement(fieldId int) (v string, err error) {
 	@retval msg - 构建好的ISO8583报文
 	@retval err - 错误
 **/
-func PrepareISO8583Message(fdSets map[uint8]string) (msg []byte, err error) {
+func PrepareISO8583Message(fdSetsMap map[uint8]string) (msg []byte, err error) {
 	bitmap := make([]byte, 8)
 	vlen := 0
 	message := make([]byte, 1024)
 	offset := 0
 	bitmapOffset := 0
 
+	var keys []int
+	for k := range fdSetsMap {
+		keys = append(keys, int(k))
+	}
+	sort.Ints(keys)
+
 	//	fmt.Printf("fdSets size:%d\r\n", len(fdSets))
-
-	for id, e := range fdSets {
-		attr, ok := fieldAttr[int(id)]
-
+	for _, id := range keys {
+		attr, ok := fieldAttr[id]
+		uintId := uint8(id)
 		if !ok {
 			err = fmt.Errorf("field attr %d not found\r\n", id)
 			return nil, err
 		}
-
+		e := fdSetsMap[uintId]
 		switch attr.format {
 		case b:
 			vlen = (len(e) + 1) / 2
@@ -232,7 +238,7 @@ func PrepareISO8583Message(fdSets map[uint8]string) (msg []byte, err error) {
 		}
 
 		if id > 0 {
-			bitmap[(id-1)/8] |= 1 << ((8 - id) % 8)
+			bitmap[(uintId-1)/8] |= 1 << ((8 - uintId) % 8)
 			//fmt.Printf("bitmap:%v", bitmap)
 		}
 
