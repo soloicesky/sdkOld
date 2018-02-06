@@ -6,15 +6,15 @@ import (
 	"bytes"
 	"crypto/cipher"
 	"crypto/des"
+	"encoding/hex"
 	"fmt"
-
 	//	"golang.org/x/crypto/pbkdf2"
 )
 
 //加密ISO8583消息
 func encryptISO8583Message(msg []byte) []byte {
-	keyV1 := ISO8583.Base16Decode("ABCDEF0123456789EEEEEEEEEEEEEEEE")
-	keyV2 := ISO8583.Base16Decode("FFFFFFFFFFFFFFFF9876543210FEDCBA")
+	keyV1, _ := hex.DecodeString("ABCDEF0123456789EEEEEEEEEEEEEEEE")
+	keyV2, _ := hex.DecodeString("FFFFFFFFFFFFFFFF9876543210FEDCBA")
 	var key []byte
 
 	for i := 0; i < len(keyV1); i++ {
@@ -24,13 +24,15 @@ func encryptISO8583Message(msg []byte) []byte {
 	var tripleDESKey []byte
 	tripleDESKey = append(tripleDESKey, key[:16]...)
 	tripleDESKey = append(tripleDESKey, key[:8]...)
-	fmt.Println("tripleDESKey ", ISO8583.Base16Encode(tripleDESKey))
+	fmt.Println("tripleDESKey ", hex.EncodeToString(tripleDESKey))
 
-	fmt.Printf("msg-----%X")
+	// fmt.Printf("msg-----%X")
 	encryptedMsg, err := TripleDesEncrypt(msg, tripleDESKey)
+
 	if err != nil {
 		fmt.Println("TripleEcbDesEncrypt error :", err.Error())
 	}
+
 	return encryptedMsg
 }
 
@@ -79,7 +81,7 @@ func createIISO8583Message(transData *TransactionData, fields []byte, config *Co
 	}
 
 	DE55 := TLV.BuildConstructTLVMsg(transData.IccRelatedData)
-	ISO8583.SetElement(55, ISO8583.Base16Encode(DE55))
+	ISO8583.SetElement(55, hex.EncodeToString(DE55))
 
 	if !ISO8583.StringIsEmpty(transData.OriginalAmount) {
 		ISO8583.SetElement(60, fmt.Sprintf("%012s", transData.OriginalAmount))
@@ -102,14 +104,16 @@ func createIISO8583Message(transData *TransactionData, fields []byte, config *Co
 	if err != nil {
 		return nil, fmt.Errorf("ISO8583::PrepareISO8583Message error: %s", err.Error())
 	}
-	fmt.Println("un encode msg: ", ISO8583.Base16Encode(msg))
+	fmt.Println("un encode msg: ", hex.EncodeToString(msg))
 	encmsg := encryptISO8583Message(msg[10:])
-	fmt.Println("encode msg: ", ISO8583.Base16Encode(encmsg))
+	fmt.Println("encode msg: ", hex.EncodeToString(encmsg))
 
 	dstMsg := make([]byte, 0)
 	dstMsg = append(dstMsg, 0x00, 0x00) // len
-	dstMsg = append(dstMsg, ISO8583.Base16Decode(config.TPDU)...)
-	dstMsg = append(dstMsg, ISO8583.Base16Decode(config.EDS)...)
+	tpdu, _ := hex.DecodeString(config.TPDU)
+	dstMsg = append(dstMsg, tpdu...)
+	eds, _ := hex.DecodeString(config.EDS)
+	dstMsg = append(dstMsg, eds...)
 	dstMsg = append(dstMsg, msg[:10]...)
 	dstMsg = append(dstMsg, encmsg...)
 	dstMsg[2+5+4] = byte(len(encmsg) >> 8)

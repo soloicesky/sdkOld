@@ -3,6 +3,7 @@ package BEA
 import (
 	"ISO8583"
 	"TLV"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"net"
@@ -35,7 +36,7 @@ func sendData(reqMsg []byte, config *Config) ([]byte, error) {
 		rspMsg = append(rspMsg, buf[0:count]...)
 
 		if len(rspMsg) >= 2 {
-			totalLen = 2 + int(rspMsg[0]<<8) + int(rspMsg[1])
+			totalLen = 2 + (int(rspMsg[0]) << 8) + int(rspMsg[1])
 		}
 
 		if totalLen > 0 && len(rspMsg) >= totalLen {
@@ -67,7 +68,7 @@ func saveData(fieldId int, value string, storage interface{}) error {
 	case 39:
 		transData.ResponseCode = BEACode(value)
 	case 55:
-		de55 := ISO8583.Base16Decode(value)
+		de55, _ := hex.DecodeString(value)
 		TLV.ParseConstructTLVMsg(de55, transData.IccRelatedData)
 	}
 
@@ -86,13 +87,13 @@ func communicateWithHost(transData *TransactionData, config *Config, fields []by
 		return transData, fmt.Errorf("CreateIISO8583Message error: %s", err.Error())
 	}
 
-	fmt.Printf("Final Msg:%s\r\n", ISO8583.Base16Encode(msg))
+	fmt.Printf("Final Msg:%s\r\n", hex.EncodeToString(msg))
 	msg, err = sendData(msg, config)
 	if err != nil {
 		return nil, err
 	}
 
-	fmt.Printf("reponse ISO8583:%s\r\n", ISO8583.Base16Encode(msg))
+	fmt.Printf("reponse ISO8583:%s\r\n", hex.EncodeToString(msg))
 	err = ISO8583.DecodeISO8583Message(msg[2+5:], saveData, transData)
 	if err != nil {
 		transData.ResponseCode = BINDO_RECV_ERR
