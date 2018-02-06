@@ -1,9 +1,8 @@
 package TLV
 
 import (
+	"encoding/hex"
 	"fmt"
-
-	"github.com/zhulingbiezhi/sdkOld/ISO8583"
 )
 
 /**
@@ -14,8 +13,9 @@ func BuildConstructTLVMsg(tlvmap map[string]string) []byte {
 	dstMsg := make([]byte, 1)
 	for k, v := range tlvmap {
 		fmt.Printf("tag:%s--val:%s", k, v)
-		dstMsg = append(dstMsg, ISO8583.Base16Decode(k)...)
-		val := ISO8583.Base16Decode(v)
+		bt, _ := hex.DecodeString(k)
+		dstMsg = append(dstMsg, bt...)
+		val, _ := hex.DecodeString(v)
 
 		if len(val) > 127 {
 			dstMsg = append(dstMsg, 0x81)
@@ -79,6 +79,6 @@ func ParseConstructTLVMsg(tlvMsg []byte, storage interface{}) {
 		stag := fmt.Sprintf("%X", tag)
 		// fmt.Printf("value:%s\r\n", ISO8583.Base16Encode(value));
 		// fmt.Printf("i=%d-len:%d\r\n", i, len(tlvMsg));
-		iccMap[stag] = ISO8583.Base16Encode(value)
+		iccMap[stag] = hex.EncodeToString(value)
 	}
 }
