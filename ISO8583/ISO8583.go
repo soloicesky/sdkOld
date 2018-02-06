@@ -154,31 +154,21 @@ func GetElement(fieldId int) (v string, err error) {
 	@retval msg - 构建好的ISO8583报文
 	@retval err - 错误
 **/
-func PrepareISO8583Message(fdSets []byte) (msg []byte, err error) {
+func PrepareISO8583Message(fdSets map[uint8]string) (msg []byte, err error) {
 	bitmap := make([]byte, 8)
 	vlen := 0
 	message := make([]byte, 1024)
 	offset := 0
 	bitmapOffset := 0
-	var attr Attr
-	var e string
-	var ok bool
 
 	//	fmt.Printf("fdSets size:%d\r\n", len(fdSets))
 
-	for _, id := range fdSets {
-		attr, ok = fieldAttr[int(id)]
+	for id, e := range fdSets {
+		attr, ok := fieldAttr[int(id)]
 
 		if !ok {
 			err = fmt.Errorf("field attr %d not found\r\n", id)
 			return nil, err
-		}
-
-		e, ok = fieldRepo[int(id)]
-
-		if !ok {
-			err = fmt.Errorf("field value %d not found\r\n", id)
-			continue
 		}
 
 		switch attr.format {
