@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/cipher"
 	"crypto/des"
+	"encoding/hex"
 	"fmt"
 
 	"github.com/zhulingbiezhi/sdkOld/ISO8583"
@@ -11,8 +12,8 @@ import (
 
 //加密ISO8583消息
 func encryptISO8583Message(msg []byte) []byte {
-	keyV1 := ISO8583.Base16Decode("ABCDEF0123456789EEEEEEEEEEEEEEEE")
-	keyV2 := ISO8583.Base16Decode("FFFFFFFFFFFFFFFF9876543210FEDCBA")
+	keyV1, _ := hex.DecodeString("ABCDEF0123456789EEEEEEEEEEEEEEEE")
+	keyV2, _ := hex.DecodeString("FFFFFFFFFFFFFFFF9876543210FEDCBA")
 	var key []byte
 
 	for i := 0; i < len(keyV1); i++ {
@@ -38,14 +39,16 @@ func createIISO8583Message(fieldsMap map[uint8]string, config *Config) ([]byte, 
 	if err != nil {
 		return nil, fmt.Errorf("ISO8583::PrepareISO8583Message error: %s", err.Error())
 	}
-	fmt.Println("un encode msg: ", ISO8583.Base16Encode(msg))
+	fmt.Println("un encode msg: ", hex.EncodeToString(msg))
 	encmsg := encryptISO8583Message(msg[10:])
-	fmt.Println("encode msg: ", ISO8583.Base16Encode(encmsg))
+	fmt.Println("encode msg: ", hex.EncodeToString(encmsg))
 
 	dstMsg := make([]byte, 0)
 	dstMsg = append(dstMsg, 0x00, 0x00) // len
-	dstMsg = append(dstMsg, ISO8583.Base16Decode(config.TPDU)...)
-	dstMsg = append(dstMsg, ISO8583.Base16Decode(config.EDS)...)
+	tpdu, _ := hex.DecodeString(config.TPDU)
+	dstMsg = append(dstMsg, tpdu...)
+	eds, _ := hex.DecodeString(config.EDS)
+	dstMsg = append(dstMsg, eds...)
 	dstMsg = append(dstMsg, msg[:10]...)
 	dstMsg = append(dstMsg, encmsg...)
 	dstMsg[2+5+4] = byte(len(encmsg) >> 8)

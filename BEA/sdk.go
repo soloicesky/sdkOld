@@ -22,7 +22,11 @@ func DoRequest(transData *TransactionData, config *Config) (*TransactionData, er
 	}
 	txnInter.SetFields()
 	fields := txnInter.Fields()
+
+	fmt.Printf("fields:%v\n", fields)
+
 	fieldsMap := txnInter.GetFieldsMap()
+	fmt.Printf("fieldsMap:%v\n", fieldsMap)
 
 	finalMap := make(map[uint8]string)
 	for _, id := range fields {
@@ -53,6 +57,14 @@ func getTransactionInterface(transData *TransactionData, config *Config) (BEAInt
 	switch transData.TransType {
 	case KindPreAuthorize:
 		return NewAuthorize(transData, config)
+	case KindSale:
+		return NewSale(transData, config)
+	case KindVoid:
+		return NewVoid(transData, config)
+	case KindRefund:
+		return NewRefund(transData, config)
+	case KindReversal:
+		return NewReversal(transData, config)
 	default:
 		return nil, fmt.Errorf("no match bea TransactionInterface")
 	}
