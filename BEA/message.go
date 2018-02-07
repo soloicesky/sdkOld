@@ -40,6 +40,7 @@ func createIISO8583Message(fieldsMap map[uint8]string, config *Config) ([]byte, 
 		return nil, fmt.Errorf("ISO8583::PrepareISO8583Message error: %s", err.Error())
 	}
 	fmt.Println("un encode msg: ", hex.EncodeToString(msg))
+	fmt.Printf("\n")
 	encmsg := encryptISO8583Message(msg[10:])
 	fmt.Println("encode msg: ", hex.EncodeToString(encmsg))
 
