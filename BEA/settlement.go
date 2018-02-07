@@ -13,12 +13,12 @@ type SettlementTransaction struct {
 
 func NewSettlement(trans *TransactionData, config *Config) (*SettlementTransaction, error) {
 	fieldMap := map[EntryMode][]uint8{
-		INSERT:   {0, 2, 3, 4, 11, 14, 22, 23, 24, 25, 35, 41, 42, 55, 62},
-		SWIPE:    {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 62},
-		WAVE:     {0, 2, 3, 4, 11, 14, 22, 23, 24, 25, 35, 41, 42, 55, 62},
-		FALLBACK: {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 62},
-		MSD:      {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 62},
-		MANUAL:   {0, 2, 3, 4, 11, 14, 22, 24, 25, 41, 42, 62},
+		INSERT:   {0, 3, 11, 24, 41, 42, 60, 62},
+		SWIPE:    {0, 3, 11, 24, 41, 42, 60, 62},
+		WAVE:     {0, 3, 11, 24, 41, 42, 60, 62},
+		FALLBACK: {0, 3, 11, 24, 41, 42, 60, 62},
+		MSD:      {0, 3, 11, 24, 41, 42, 60, 62},
+		MANUAL:   {0, 3, 11, 24, 41, 42, 60, 62},
 	}
 
 	trxn := &SettlementTransaction{
@@ -48,21 +48,35 @@ func (settlement *SettlementTransaction) Valid() error {
 	if err := settlement.baseValid(); err != nil {
 		return err
 	}
-	return validMatch(settlement.transData.Pan,
-		settlement.transData.Amount,
+	return validMatch(settlement.transData.Batchtotals,
 		settlement.transData.TransId,
-		settlement.transData.CardExpireDate,
-		settlement.transData.Track2,
+		settlement.transData.BatchNumber,
 	)
 }
 
 func (settlement *SettlementTransaction) SetFields() {
 	settlement.baseFieldSet()
-	settlement.set(3, param[settlement.transData.TransType].processingCode)
+	settlement.set(0, settlement.messageTypeId)
+	settlement.set(3, settlement.processingCode)
 	settlement.set(24, param[settlement.transData.TransType].nii)
-	settlement.set(25, param[settlement.transData.TransType].posCondictionCode)
+	settlement.set(60, fmt.Sprintf("%06s", settlement.transData.BatchNumber))
+
+	batchTotals := fmt.Sprintf("%03d%012d%03d%012d%03d%012d%03d%012d%03d%012d%03d%012d",
+		settlement.transData.Batchtotals.CapturedSalesCount, settlement.transData.Batchtotals.CapturedSalesAmount,
+		settlement.transData.Batchtotals.CapturedRefundCount, settlement.transData.Batchtotals.CapturedRefundAmount,
+		settlement.transData.Batchtotals.DebitSalesCount, settlement.transData.Batchtotals.DebitSalesAmount,
+		settlement.transData.Batchtotals.DebitRefundCount, settlement.transData.Batchtotals.DebitRefundAmount,
+		settlement.transData.Batchtotals.AuthorizeSalesCount, settlement.transData.Batchtotals.AuthorizeSalesAmount,
+		settlement.transData.Batchtotals.AuthorizeRefundCount, settlement.transData.Batchtotals.AuthorizeRefundAmount)
+
+	settlement.set(62, batchTotals)
+
 }
 
 func (settlement *SettlementTransaction) Fields() []uint8 {
-	return settlement.entryMap[settlement.transData.PosEntryMode]
+	return []byte{0, 3, 11, 24, 41, 42, 60, 62}
+}
+
+func (settlement *SettlementTransaction) Name() string {
+	return string(settlement.transData.TransType)
 }

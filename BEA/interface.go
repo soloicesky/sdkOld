@@ -49,8 +49,7 @@ func (e *BaseElement) baseFieldSet() {
 }
 
 func (e *BaseElement) baseValid() error {
-	return validMatch(e.transData.Pan,
-		e.transData.TransId,
+	return validMatch(e.transData.TransId,
 		e.config.TerminalId,
 	)
 }
