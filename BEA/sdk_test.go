@@ -91,7 +91,7 @@ func TestSales(t *testing.T) {
 		Pan:            "5413330089020029",                  //"5413330089020029D2512201062980790"
 		CardExpireDate: "2512",                              //2212
 		Track2:         "5413330089020029D2512201062980790", // 4761739001010432D22122011631141689
-		PosEntryMode:   INSERT,
+		PosEntryMode:   SWIPE,
 		IccRelatedData: VISIccRelatedData,
 	}
 
@@ -166,6 +166,56 @@ func TestVoid(t *testing.T) {
 	fmt.Printf("response data: %s", resp.FormJson())
 	fmt.Println("---------------Success TestVoid-------------")
 }
+
+func TestAdjustSale(t *testing.T) {
+	fmt.Println("---------------Start TestAdjustSale-------------")
+	transData := &TransactionData{
+		OriginalTransType: KindSale,
+		TransType:         KindAdjustSale,
+		Amount:            "109800",
+		OriginalAmount:    "106800",
+		TipAmount:         "3000",
+		TransId:           "000139",
+		Pan:               "5413330089020029",
+		CardExpireDate:    "2512",
+		AcquireTransID:    "180207613032",
+		AuthCode:          "005944",
+		PosEntryMode:      SWIPE,
+		IccRelatedData:    IccRelatedData,
+	}
+	fmt.Printf("request data: %s", transData.FormJson())
+	resp, err := DoRequest(transData, getConfig())
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+	fmt.Printf("response data: %s", resp.FormJson())
+	fmt.Println("---------------Success TestReversal-------------")
+}
+
+// func TestVoid(t *testing.T) {
+// 	fmt.Println("---------------Start TestVoid-------------")
+// 	transData := &TransactionData{
+// 		TransType:         KindVoid,
+// 		Amount:            "22500",
+// 		TransId:           "000130",
+// 		Pan:               "5413330089020029",
+// 		CardExpireDate:    "2512",
+// 		Track2:            "5413330089020029D2512201062980790",
+// 		PosEntryMode:      INSERT,
+// 		IccRelatedData:    IccRelatedData,
+// 		OriginalTransType: KindSale,
+// 		AcquireTransID:    "123456789012",
+// 	}
+// 	fmt.Printf("request data: %s", transData.FormJson())
+// 	resp, err := DoRequest(transData, getConfig())
+// 	if err != nil {
+// 		t.Errorf(err.Error())
+// 		return
+// 	}
+// 	fmt.Printf("response data: %s", resp.FormJson())
+// 	fmt.Println("---------------Success TestVoid-------------")
+// }
 
 func TestReversal(t *testing.T) {
 	fmt.Println("---------------Start TestReversal-------------")

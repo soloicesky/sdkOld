@@ -65,6 +65,8 @@ func getTransactionInterface(transData *TransactionData, config *Config) (BEAInt
 		return NewRefund(transData, config)
 	case KindReversal:
 		return NewReversal(transData, config)
+	case KindAdjustSale:
+		return NewAdjustSale(transData, config)
 	default:
 		return nil, fmt.Errorf("no match bea TransactionInterface")
 	}
