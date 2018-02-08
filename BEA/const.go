@@ -41,6 +41,7 @@ const (
 	KindVoidAdjustRefund               TransactionType = "VOIDADJUSTREFUND"               //调整退货撤销
 	KindVoidUploadAdjustRefund         TransactionType = "VOIDUPLOADADJUSTREFUND"         //上送退货调整撤销
 	KindVoid                           TransactionType = "VOID"                           //撤销
+	KindInitialization                 TransactionType = "INITIALIZATION"                 //初始化
 )
 
 type EntryMode string
@@ -107,6 +108,7 @@ var param = map[TransactionType]msgParam{
 	KindVoidAdjustRefund:               {"0220", "220000", "028", "00"}, //退货调整撤销
 	KindVoidUploadAdjustRefund:         {"0220", "220000", "028", "00"}, //退货调整上送撤销
 	KindVoid:                           {"0220", "220000", "028", "00"}, //撤销
+	KindInitialization:                 {"0800", "220000", "028", "00"}, //撤销
 }
 
 func getAllEntryModes() []EntryMode {
@@ -136,6 +138,7 @@ var DE55TagList = []string{
 	"5F2A",
 	"82",
 	"84",
+	"95",
 	"9A",
 	"9B",
 	"9C",
