@@ -41,6 +41,8 @@ func NewVoid(trans *TransactionData, config *Config) (*VoidTransaction, error) {
 		trxn.processingCode = "000000"
 	case KindPreAuthCompletion:
 		trxn.processingCode = "000000"
+	case KindAdjustSale:
+		trxn.processingCode = "020000"
 	default:
 		return nil, fmt.Errorf("unknow transaction type:%s", string(trans.OriginalTransType))
 	}
@@ -77,7 +79,7 @@ func (void *VoidTransaction) SetFields() {
 	case MANUAL:
 		de22 = "01"
 	case WAVE:
-		de22 = ""
+		de22 = "07"
 	}
 
 	if len(void.transData.Pin) > 0 {
