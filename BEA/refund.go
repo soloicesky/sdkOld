@@ -62,7 +62,7 @@ func (refund *RefundTransaction) SetFields() {
 	case FALLBACK:
 		de22 = "80"
 	case WAVE:
-		de22 = "70"
+		de22 = "07"
 	}
 
 	if len(refund.transData.Pin) > 0 {
