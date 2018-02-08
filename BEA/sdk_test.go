@@ -87,11 +87,12 @@ func TestSales(t *testing.T) {
 	transData := &TransactionData{
 		TransType:      KindSale,
 		Amount:         "00000010000",
+		TipAmount:      "1000",
 		TransId:        "000149",
 		Pan:            "4761739001010432",                   //"5413330089020029D2512201062980790"
 		CardExpireDate: "2212",                               //2212
 		Track2:         "4761739001010432D22122011631141689", // 4761739001010432D22122011631141689
-		PosEntryMode:   INSERT,
+		PosEntryMode:   WAVE,
 		IccRelatedData: VISIccRelatedData,
 	}
 
@@ -265,6 +266,33 @@ func TestInitialization(t *testing.T) {
 }
 
 func TestBatchUpload(t *testing.T) {
+	fmt.Println("---------------Start TestBatchUpload-------------")
+	transData := &TransactionData{
+		TransType:         KindBatchUploadLast,
+		Pan:               "5413330089020029",
+		CardExpireDate:    "2512",
+		TransId:           "000139",
+		AcquireTransID:    "180207613032",
+		OriginalTransType: KindSale,
+		Amount:            "106800",
+		AuthCode:          "005944",
+		ResponseCode:      "00",
+		Track2:            "5413330089020029D2512201062980790",
+		TransDate:         "0207",
+		TransTime:         "100453",
+		PosEntryMode:      SWIPE,
+	}
+	fmt.Printf("request data: %s", transData.FormJson())
+	resp, err := DoRequest(transData, getConfig())
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+	fmt.Printf("response data: %s", resp.FormJson())
+	fmt.Println("---------------Success TestBatchUpload-------------")
+}
+
+func TestAuthCompletion(t *testing.T) {
 	fmt.Println("---------------Start TestBatchUpload-------------")
 	transData := &TransactionData{
 		TransType:         KindBatchUploadLast,

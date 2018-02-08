@@ -1,5 +1,11 @@
 package BEA
 
+import (
+	"TLV"
+	"encoding/hex"
+	"fmt"
+)
+
 type AuthorizeTransaction struct {
 	entryMap map[EntryMode][]uint8
 	BaseElement
@@ -45,7 +51,51 @@ func (auth *AuthorizeTransaction) Name() string {
 
 func (auth *AuthorizeTransaction) SetFields() {
 	auth.baseFieldSet()
-	auth.set(3, param[auth.transData.TransType].processingCode)
+	auth.set(0, auth.messageTypeId)
+	auth.set(3, auth.processingCode)
+
+	var de22 string
+
+	switch auth.transData.PosEntryMode {
+	case INSERT:
+		de22 = "05"
+	case SWIPE:
+		de22 = "90"
+	case MANUAL:
+		de22 = "01"
+	case FALLBACK:
+		de22 = "80"
+	case WAVE:
+		de22 = "07"
+	}
+
+	if len(auth.transData.Pin) > 0 {
+		de22 += "1"
+	} else {
+		de22 += "2"
+	}
+
+	auth.set(22, de22)
+	auth.set(24, param[auth.transData.TransType].nii)
+	auth.set(25, param[auth.transData.TransType].posCondictionCode)
+
+	switch auth.transData.PosEntryMode {
+	case INSERT:
+		fallthrough
+	case WAVE:
+		var iccData = make(map[string]string)
+
+		for _, tag := range DE55TagList {
+			// fmt.Printf("tag:%v\n", tag)
+			iccData[tag] = auth.transData.IccRelatedData[tag]
+		}
+
+		fmt.Printf("iccdata:%v\r\n", iccData)
+
+		de55 := TLV.BuildConstructTLVMsg(iccData)
+		auth.set(55, hex.EncodeToString(de55))
+	default:
+	}
 	auth.set(24, param[auth.transData.TransType].nii)
 	auth.set(25, param[auth.transData.TransType].posCondictionCode)
 }

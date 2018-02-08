@@ -64,7 +64,7 @@ func (sale *SaleTransaction) SetFields() {
 	case FALLBACK:
 		de22 = "80"
 	case WAVE:
-		de22 = "70"
+		de22 = "07"
 	}
 
 	if len(sale.transData.Pin) > 0 {
@@ -95,6 +95,7 @@ func (sale *SaleTransaction) SetFields() {
 	default:
 	}
 
+	sale.set(54, fmt.Sprintf("%012s", sale.transData.TipAmount))
 	sale.set(62, sale.transData.TransId)
 }
 
