@@ -1,16 +1,19 @@
 package BEA
 
 import (
-	"ISO8583"
-	"TLV"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"net"
 	"time"
+
+	"github.com/zhulingbiezhi/sdkOld/TLV"
+
+	"github.com/zhulingbiezhi/sdkOld/ISO8583"
 )
 
 //和后台通信发送授权请求报文并接收授权响应报文
-func sendData(reqMsg []byte, config *Config) ([]byte, error) {
+func sendReceiveData(reqMsg []byte, config *Config) ([]byte, error) {
 	rspMsg := make([]byte, 0)
 	conn, err := net.Dial("tcp", config.Host)
 	if err != nil {
@@ -35,7 +38,7 @@ func sendData(reqMsg []byte, config *Config) ([]byte, error) {
 		rspMsg = append(rspMsg, buf[0:count]...)
 
 		if len(rspMsg) >= 2 {
-			totalLen = 2 + int(rspMsg[0]<<8) + int(rspMsg[1])
+			totalLen = 2 + (int(rspMsg[0]) << 8) + int(rspMsg[1])
 		}
 
 		if totalLen > 0 && len(rspMsg) >= totalLen {
@@ -67,7 +70,7 @@ func saveData(fieldId int, value string, storage interface{}) error {
 	case 39:
 		transData.ResponseCode = BEACode(value)
 	case 55:
-		de55 := ISO8583.Base16Decode(value)
+		de55, _ := hex.DecodeString(value)
 		TLV.ParseConstructTLVMsg(de55, transData.IccRelatedData)
 	}
 
@@ -80,19 +83,19 @@ func saveData(fieldId int, value string, storage interface{}) error {
 	config 配置参数
 	fields 域集合
 **/
-func communicateWithHost(transData *TransactionData, config *Config, fields []byte) (*TransactionData, error) {
-	msg, err := createIISO8583Message(transData, fields, config)
+func communicateWithHost(transData *TransactionData, config *Config, fieldsMap map[uint8]string) (*TransactionData, error) {
+	msg, err := createIISO8583Message(fieldsMap, config)
 	if err != nil {
 		return transData, fmt.Errorf("CreateIISO8583Message error: %s", err.Error())
 	}
 
-	fmt.Printf("Final Msg:%s\r\n", ISO8583.Base16Encode(msg))
-	msg, err = sendData(msg, config)
+	fmt.Printf("Final Msg:%s\r\n", hex.EncodeToString(msg))
+	msg, err = sendReceiveData(msg, config)
 	if err != nil {
 		return nil, err
 	}
 
-	fmt.Printf("reponse ISO8583:%s\r\n", ISO8583.Base16Encode(msg))
+	fmt.Printf("reponse ISO8583:%s\r\n", hex.EncodeToString(msg))
 	err = ISO8583.DecodeISO8583Message(msg[2+5:], saveData, transData)
 	if err != nil {
 		transData.ResponseCode = BINDO_RECV_ERR
