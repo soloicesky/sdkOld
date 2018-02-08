@@ -34,12 +34,14 @@ func (adjustSale *AdjustSaleTransaction) Valid() error {
 	if err := adjustSale.baseValid(); err != nil {
 		return err
 	}
+	//Transaction = AdjustTips Transaction
+	//FromTransaction Sales/Authoriz Transaction
 	return validMatch(adjustSale.transData.Pan,
-		adjustSale.transData.Amount,
+		adjustSale.transData.Amount, //FromTransaction.TotalAmount + Transaction.Amount
 		adjustSale.transData.TransId,
 		adjustSale.transData.CardExpireDate,
-		adjustSale.transData.TipAmount,
-		adjustSale.transData.OriginalAmount,
+		adjustSale.transData.TipAmount,      //Transaction.Amount
+		adjustSale.transData.OriginalAmount, //FromTransacion.TotalAmount
 	)
 }
 
