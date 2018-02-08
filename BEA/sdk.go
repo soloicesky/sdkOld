@@ -75,6 +75,8 @@ func getTransactionInterface(transData *TransactionData, config *Config) (BEAInt
 		fallthrough
 	case KindBatchUploadLast:
 		return NewBatchUpload(transData, config)
+	case KindInitialization:
+		return NewInitialization(transData, config)
 	default:
 		return nil, fmt.Errorf("no match bea TransactionInterface")
 	}

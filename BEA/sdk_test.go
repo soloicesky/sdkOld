@@ -56,7 +56,7 @@ var VISIccRelatedData = map[string]string{
 	"9F35": "22",
 	"9F36": "0001",
 	"9F37": "C1EBF80F",
-	"9F41": "00000130",
+	"9F41": "00000149",
 	"9F10": "06010A03A00000",
 }
 
@@ -86,12 +86,12 @@ func TestSales(t *testing.T) {
 	fmt.Println("---------------Start TestSales-------------")
 	transData := &TransactionData{
 		TransType:      KindSale,
-		Amount:         "000000106800",
-		TransId:        "000135",
-		Pan:            "5413330089020029",                  //"5413330089020029D2512201062980790"
-		CardExpireDate: "2512",                              //2212
-		Track2:         "5413330089020029D2512201062980790", // 4761739001010432D22122011631141689
-		PosEntryMode:   SWIPE,
+		Amount:         "00000010000",
+		TransId:        "000149",
+		Pan:            "4761739001010432",                   //"5413330089020029D2512201062980790"
+		CardExpireDate: "2212",                               //2212
+		Track2:         "4761739001010432D22122011631141689", // 4761739001010432D22122011631141689
+		PosEntryMode:   INSERT,
 		IccRelatedData: VISIccRelatedData,
 	}
 
@@ -220,11 +220,11 @@ func TestReversal(t *testing.T) {
 func TestSettlement(t *testing.T) {
 	fmt.Println("---------------Start TestSettlement-------------")
 	transData := &TransactionData{
-		TransType: KindSettlment,
+		TransType: KindSettlmentAfterUpload,
 		TransId:   "000139",
 		Batchtotals: &BatchTotals{
-			CapturedSalesCount:    0,
-			CapturedSalesAmount:   0,
+			CapturedSalesCount:    1,
+			CapturedSalesAmount:   100,
 			CapturedRefundCount:   0,
 			CapturedRefundAmount:  0,
 			DebitSalesCount:       0,
@@ -248,10 +248,26 @@ func TestSettlement(t *testing.T) {
 	fmt.Println("---------------Success TestSettlement-------------")
 }
 
+func TestInitialization(t *testing.T) {
+	fmt.Println("---------------Start TestInitialization-------------")
+	transData := &TransactionData{
+		TransType: KindInitialization,
+		TransId:   "000009",
+	}
+	fmt.Printf("request data: %s", transData.FormJson())
+	resp, err := DoRequest(transData, getConfig())
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+	fmt.Printf("response data: %s", resp.FormJson())
+	fmt.Println("---------------Success TestInitialization-------------")
+}
+
 func TestBatchUpload(t *testing.T) {
 	fmt.Println("---------------Start TestBatchUpload-------------")
 	transData := &TransactionData{
-		TransType:         KindBatchUpload,
+		TransType:         KindBatchUploadLast,
 		Pan:               "5413330089020029",
 		CardExpireDate:    "2512",
 		TransId:           "000139",
