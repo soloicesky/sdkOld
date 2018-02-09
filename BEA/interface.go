@@ -70,7 +70,7 @@ func validMatch(args ...interface{}) error {
 			}
 
 		default:
-			if refValue.IsNil() {
+			if refValue.Type().Kind() == reflect.Ptr && refValue.IsNil() {
 				return fmt.Errorf("%d: the paraments of BEATransaction.struct is empty !", i)
 			}
 		}
