@@ -89,10 +89,10 @@ func TestSales(t *testing.T) {
 		Amount:         "00000010000",
 		TipAmount:      "1000",
 		TransId:        "000149",
-		Pan:            "4761739001010432",                   //"5413330089020029D2512201062980790"
-		CardExpireDate: "2212",                               //2212
-		Track2:         "4761739001010432D22122011631141689", // 4761739001010432D22122011631141689
-		PosEntryMode:   WAVE,
+		Pan:            "5413330089020029",                  //"5413330089020029D2512201062980790"
+		CardExpireDate: "2512",                              //2212
+		Track2:         "5413330089020029D2512201062980790", // 4761739001010432D22122011631141689
+		PosEntryMode:   SWIPE,
 		IccRelatedData: VISIccRelatedData,
 	}
 
