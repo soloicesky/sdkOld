@@ -98,6 +98,7 @@ func (auth *AuthorizeTransaction) SetFields() {
 	}
 	auth.set(24, param[auth.transData.TransType].nii)
 	auth.set(25, param[auth.transData.TransType].posCondictionCode)
+	auth.set(62, auth.transData.TransId)
 }
 
 func (auth *AuthorizeTransaction) Fields() []uint8 {
