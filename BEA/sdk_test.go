@@ -221,11 +221,11 @@ func TestReversal(t *testing.T) {
 func TestSettlement(t *testing.T) {
 	fmt.Println("---------------Start TestSettlement-------------")
 	transData := &TransactionData{
-		TransType: KindSettlmentAfterUpload,
+		TransType: KindSettlment,
 		TransId:   "000139",
 		Batchtotals: &BatchTotals{
-			CapturedSalesCount:    1,
-			CapturedSalesAmount:   100,
+			CapturedSalesCount:    3,
+			CapturedSalesAmount:   12300,
 			CapturedRefundCount:   0,
 			CapturedRefundAmount:  0,
 			DebitSalesCount:       0,
@@ -237,7 +237,7 @@ func TestSettlement(t *testing.T) {
 			AuthorizeRefundCount:  0,
 			AuthorizeRefundAmount: 0,
 		},
-		BatchNumber: "000001",
+		BatchNumber: "000012",
 	}
 	fmt.Printf("request data: %s", transData.FormJson())
 	resp, err := DoRequest(transData, getConfig())

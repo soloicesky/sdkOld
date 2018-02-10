@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"math/rand"
 	"net"
 	"time"
 
@@ -84,23 +85,58 @@ func saveData(fieldId int, value string, storage interface{}) error {
 	fields 域集合
 **/
 func communicateWithHost(transData *TransactionData, config *Config, fieldsMap map[uint8]string) (*TransactionData, error) {
-	msg, err := createIISO8583Message(fieldsMap, config)
-	if err != nil {
-		return transData, fmt.Errorf("CreateIISO8583Message error: %s", err.Error())
-	}
+	// msg, err := createIISO8583Message(fieldsMap, config)
+	// if err != nil {
+	// 	return transData, fmt.Errorf("CreateIISO8583Message error: %s", err.Error())
+	// }
 
-	fmt.Printf("Final Msg:%s\r\n", hex.EncodeToString(msg))
-	msg, err = sendReceiveData(msg, config)
-	if err != nil {
-		return nil, err
-	}
+	// fmt.Printf("Final Msg:%s\r\n", hex.EncodeToString(msg))
+	// msg, err = sendReceiveData(msg, config)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	fmt.Printf("reponse ISO8583:%s\r\n", hex.EncodeToString(msg))
-	err = ISO8583.DecodeISO8583Message(msg[2+5:], saveData, transData)
-	if err != nil {
-		transData.ResponseCode = BINDO_RECV_ERR
-		return nil, fmt.Errorf("ISO8583::DecodeISO8583Message error: %s", err.Error())
-	}
+	// fmt.Printf("reponse ISO8583:%s\r\n", hex.EncodeToString(msg))
+	// err = ISO8583.DecodeISO8583Message(msg[2+5:], saveData, transData)
+	// if err != nil {
+	// 	transData.ResponseCode = BINDO_RECV_ERR
+	// 	return nil, fmt.Errorf("ISO8583::DecodeISO8583Message error: %s", err.Error())
+	// }
 
+	transData.ResponseCode = "00"
+	rrn := RandomStr(RandomStrTypeNumber, 12)
+	transData.AcquireTransID = rrn
+	authCode := RandomStr(RandomStrTypeNumber, 6)
+	transData.AuthCode = authCode
 	return transData, nil
+}
+
+const (
+	RandomStrTypeNumber = 1
+	RandomStrTypeAlpha  = 2
+	RandomStrTypeMxied  = 3
+)
+
+var randomStrFull = "0123456789qwertyuiopasdfghjklzxcvbnm"
+var r *rand.Rand = rand.New(rand.NewSource(time.Now().Unix()))
+
+func RandomStr(t int, l int) string {
+
+	min := 0
+	max := len(randomStrFull)
+	switch t {
+	case RandomStrTypeNumber:
+		max = 10
+		break
+	case RandomStrTypeAlpha:
+		min = 10
+		break
+	case RandomStrTypeMxied:
+		break
+	}
+	str := ""
+	for i := 0; i < l; i++ {
+		str += string(randomStrFull[min+r.Intn(max-min)])
+	}
+	return str
 }
