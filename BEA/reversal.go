@@ -1,9 +1,10 @@
 package BEA
 
 import (
-	"TLV"
 	"encoding/hex"
 	"fmt"
+
+	"github.com/zhulingbiezhi/sdkOld/TLV"
 )
 
 type ReversalTransaction struct {
