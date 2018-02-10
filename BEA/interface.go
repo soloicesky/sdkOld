@@ -61,11 +61,17 @@ func validMatch(args ...interface{}) error {
 		switch refType.Kind() {
 		case reflect.String:
 			if refValue.String() == "" {
-				return fmt.Errorf("the paraments of BEATransaction.%s is empty !", refType.Elem().Name())
+				return fmt.Errorf("%d: the paraments of BEATransaction.string is empty !", i)
 			}
+
+		case reflect.Map:
+			if len(refValue.MapKeys()) == 0 {
+				return fmt.Errorf("%d: the paraments of BEATransaction.map is empty !", i)
+			}
+
 		default:
-			if refValue.IsNil() {
-				return fmt.Errorf("the paraments of BEATransaction.%s is empty !", refType.Elem().Name())
+			if refValue.Type().Kind() == reflect.Ptr && refValue.IsNil() {
+				return fmt.Errorf("%d: the paraments of BEATransaction.struct is empty !", i)
 			}
 		}
 
