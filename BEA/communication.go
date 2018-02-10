@@ -1,6 +1,7 @@
 package BEA
 
 import (
+	"ISO8583"
 	"TLV"
 	"encoding/hex"
 	"errors"
@@ -82,33 +83,33 @@ func saveData(fieldId int, value string, storage interface{}) error {
 	fields 域集合
 **/
 func communicateWithHost(transData *TransactionData, config *Config, fieldsMap map[uint8]string) (*TransactionData, error) {
-	// msg, err := createIISO8583Message(fieldsMap, config)
-	// if err != nil {
-	// 	return transData, fmt.Errorf("CreateIISO8583Message error: %s", err.Error())
-	// }
-
-	// fmt.Printf("Final Msg:%s\r\n", hex.EncodeToString(msg))
-	// msg, err = sendReceiveData(msg, config)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// fmt.Printf("reponse ISO8583:%s\r\n", hex.EncodeToString(msg))
-	// err = ISO8583.DecodeISO8583Message(msg[2+5:], saveData, transData)
-	// if err != nil {
-	// 	transData.ResponseCode = BINDO_RECV_ERR
-	// 	return nil, fmt.Errorf("ISO8583::DecodeISO8583Message error: %s", err.Error())
-	// }
-	switch transData.TransType {
-	case KindSettlment:
-		transData.ResponseCode = "95"
-	default:
-		transData.ResponseCode = "00"
+	msg, err := createIISO8583Message(fieldsMap, config)
+	if err != nil {
+		return transData, fmt.Errorf("CreateIISO8583Message error: %s", err.Error())
 	}
-	rrn := RandomStr(RandomStrTypeNumber, 12)
-	transData.AcquireTransID = rrn
-	authCode := RandomStr(RandomStrTypeNumber, 6)
-	transData.AuthCode = authCode
+
+	fmt.Printf("Final Msg:%s\r\n", hex.EncodeToString(msg))
+	msg, err = sendReceiveData(msg, config)
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Printf("reponse ISO8583:%s\r\n", hex.EncodeToString(msg))
+	err = ISO8583.DecodeISO8583Message(msg[2+5:], saveData, transData)
+	if err != nil {
+		transData.ResponseCode = BINDO_RECV_ERR
+		return nil, fmt.Errorf("ISO8583::DecodeISO8583Message error: %s", err.Error())
+	}
+	// switch transData.TransType {
+	// case KindSettlment:
+	// 	transData.ResponseCode = "95"
+	// default:
+	// 	transData.ResponseCode = "00"
+	// }
+	// rrn := RandomStr(RandomStrTypeNumber, 12)
+	// transData.AcquireTransID = rrn
+	// authCode := RandomStr(RandomStrTypeNumber, 6)
+	// transData.AuthCode = authCode
 	return transData, nil
 }
 
