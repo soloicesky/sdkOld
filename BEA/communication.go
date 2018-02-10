@@ -9,8 +9,6 @@ import (
 	"time"
 
 	"github.com/zhulingbiezhi/sdkOld/TLV"
-
-	"github.com/zhulingbiezhi/sdkOld/ISO8583"
 )
 
 //和后台通信发送授权请求报文并接收授权响应报文
