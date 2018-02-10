@@ -101,9 +101,9 @@ func communicateWithHost(transData *TransactionData, config *Config, fieldsMap m
 	// }
 
 	transData.ResponseCode = "00"
-	rrn := RandomStr(RandomStrTypeAlpha, 12)
+	rrn := RandomStr(RandomStrTypeNumber, 12)
 	transData.AcquireTransID = rrn
-	authCode := RandomStr(RandomStrTypeAlpha, 6)
+	authCode := RandomStr(RandomStrTypeNumber, 6)
 	transData.AuthCode = authCode
 	return transData, nil
 }
@@ -115,9 +115,10 @@ const (
 )
 
 var randomStrFull = "0123456789qwertyuiopasdfghjklzxcvbnm"
+var r *rand.Rand = rand.New(rand.NewSource(time.Now().Unix()))
 
 func RandomStr(t int, l int) string {
-	r := rand.New(rand.NewSource(time.Now().Unix()))
+
 	min := 0
 	max := len(randomStrFull)
 	switch t {
