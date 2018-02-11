@@ -84,33 +84,47 @@ func saveData(fieldId int, value string, storage interface{}) error {
 	fields 域集合
 **/
 func communicateWithHost(transData *TransactionData, config *Config, fieldsMap map[uint8]string) (*TransactionData, error) {
-	msg, err := createIISO8583Message(fieldsMap, config)
-	if err != nil {
-		return transData, fmt.Errorf("CreateIISO8583Message error: %s", err.Error())
-	}
 
-	fmt.Printf("Final Msg:%s\r\n", hex.EncodeToString(msg))
-	msg, err = sendReceiveData(msg, config)
-	if err != nil {
-		return nil, err
-	}
+	switch config.TerminalId {
+	default:
+		fallthrough
+	case "63150001":
+		msg, err := createIISO8583Message(fieldsMap, config)
+		if err != nil {
+			return transData, fmt.Errorf("CreateIISO8583Message error: %s", err.Error())
+		}
 
-	fmt.Printf("reponse ISO8583:%s\r\n", hex.EncodeToString(msg))
-	err = ISO8583.DecodeISO8583Message(msg[2+5:], saveData, transData)
-	if err != nil {
-		transData.ResponseCode = BINDO_RECV_ERR
-		return nil, fmt.Errorf("ISO8583::DecodeISO8583Message error: %s", err.Error())
+		fmt.Printf("Final Msg:%s\r\n", hex.EncodeToString(msg))
+		msg, err = sendReceiveData(msg, config)
+		if err != nil {
+			return nil, err
+		}
+
+		fmt.Printf("reponse ISO8583:%s\r\n", hex.EncodeToString(msg))
+		err = ISO8583.DecodeISO8583Message(msg[2+5:], saveData, transData)
+		if err != nil {
+			transData.ResponseCode = BINDO_RECV_ERR
+			return nil, fmt.Errorf("ISO8583::DecodeISO8583Message error: %s", err.Error())
+		}
+	case "63150002" //帐不平
+		switch transData.TransType {
+		case KindSettlment:
+			transData.ResponseCode = "95"
+		default:
+			transData.ResponseCode = "00"
+		}
+		rrn := RandomStr(RandomStrTypeNumber, 12)
+		transData.AcquireTransID = rrn
+		authCode := RandomStr(RandomStrTypeNumber, 6)
+		transData.AuthCode = authCode
+	case "63150003" //帐平
+		transData.ResponseCode = "00"
+		rrn := RandomStr(RandomStrTypeNumber, 12)
+		transData.AcquireTransID = rrn
+		authCode := RandomStr(RandomStrTypeNumber, 6)
+		transData.AuthCode = authCode
 	}
-	// switch transData.TransType {
-	// case KindSettlment:
-	// 	transData.ResponseCode = "95"
-	// default:
-	// 	transData.ResponseCode = "00"
-	// }
-	// rrn := RandomStr(RandomStrTypeNumber, 12)
-	// transData.AcquireTransID = rrn
-	// authCode := RandomStr(RandomStrTypeNumber, 6)
-	// transData.AuthCode = authCode
+	
 	return transData, nil
 }
 
