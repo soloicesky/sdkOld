@@ -48,7 +48,6 @@ func NewBatchUpload(trans *TransactionData, config *Config) (*BatchUploadTransac
 	default:
 		return nil, fmt.Errorf("unknow transaction type:%s", trans.OriginalTransType)
 	}
-
 	return trxn, nil
 }
 
