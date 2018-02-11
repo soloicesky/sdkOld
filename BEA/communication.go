@@ -106,7 +106,7 @@ func communicateWithHost(transData *TransactionData, config *Config, fieldsMap m
 			transData.ResponseCode = BINDO_RECV_ERR
 			return nil, fmt.Errorf("ISO8583::DecodeISO8583Message error: %s", err.Error())
 		}
-	case "63150002" //帐不平
+	case "63150002": //帐不平
 		switch transData.TransType {
 		case KindSettlment:
 			transData.ResponseCode = "95"
@@ -117,14 +117,14 @@ func communicateWithHost(transData *TransactionData, config *Config, fieldsMap m
 		transData.AcquireTransID = rrn
 		authCode := RandomStr(RandomStrTypeNumber, 6)
 		transData.AuthCode = authCode
-	case "63150003" //帐平
+	case "63150003": //帐平
 		transData.ResponseCode = "00"
 		rrn := RandomStr(RandomStrTypeNumber, 12)
 		transData.AcquireTransID = rrn
 		authCode := RandomStr(RandomStrTypeNumber, 6)
 		transData.AuthCode = authCode
 	}
-	
+
 	return transData, nil
 }
 
