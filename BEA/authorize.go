@@ -42,7 +42,7 @@ func (auth *AuthorizeTransaction) Valid() error {
 		auth.transData.Amount,
 		auth.transData.TransId,
 		auth.transData.CardExpireDate,
-		auth.transData.Track2,
+		// auth.transData.Track2,
 	)
 }
 

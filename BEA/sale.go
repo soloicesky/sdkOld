@@ -43,7 +43,7 @@ func (sale *SaleTransaction) Valid() error {
 		sale.transData.Amount,
 		sale.transData.TransId,
 		sale.transData.CardExpireDate,
-		sale.transData.Track2,
+		// sale.transData.Track2,
 	)
 }
 

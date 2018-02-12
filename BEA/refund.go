@@ -42,7 +42,7 @@ func (refund *RefundTransaction) Valid() error {
 		refund.transData.Amount,
 		refund.transData.TransId,
 		refund.transData.CardExpireDate,
-		refund.transData.Track2,
+		// refund.transData.Track2,
 	)
 }
 
