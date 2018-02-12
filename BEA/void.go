@@ -59,7 +59,7 @@ func (void *VoidTransaction) Valid() error {
 		void.transData.Amount,
 		void.transData.TransId,
 		void.transData.CardExpireDate,
-		void.transData.Track2,
+		// void.transData.Track2,
 	)
 }
 

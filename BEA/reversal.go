@@ -56,7 +56,7 @@ func (reversal *ReversalTransaction) Valid() error {
 		reversal.transData.Amount,
 		reversal.transData.TransId,
 		reversal.transData.CardExpireDate,
-		reversal.transData.Track2,
+		// reversal.transData.Track2,
 	)
 }
 
