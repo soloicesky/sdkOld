@@ -81,6 +81,8 @@ func (void *VoidTransaction) SetFields() {
 		de22 = "01"
 	case WAVE:
 		de22 = "07"
+	case MSD:
+		de22 = "91"
 	}
 
 	if len(void.transData.Pin) > 0 {
