@@ -28,30 +28,39 @@ func NewBatchUpload(trans *TransactionData, config *Config) (*BatchUploadTransac
 		processingCode: "000000",
 	}
 
+	lastFlag := "1"
+
 	switch trans.OriginalTransType {
 	case KindSale:
-		trxn.processingCode = "000000"
+		trxn.processingCode = "00000"
 	case KindVoidSale:
-		trxn.processingCode = "020000"
+		trxn.processingCode = "02000"
 	case KindRefund:
-		trxn.processingCode = "000000"
+		trxn.processingCode = "00000"
 	case KindVoidRefund:
-		trxn.processingCode = "000000"
+		trxn.processingCode = "00000"
 	case KindPreAuthorize:
-		trxn.processingCode = "000000"
+		trxn.processingCode = "00000"
 	case KindPreAuthCompletion:
-		trxn.processingCode = "000000"
+		trxn.processingCode = "00000"
 	case KindVoidPreAuthorize:
-		trxn.processingCode = "000000"
+		trxn.processingCode = "00000"
 	case KindVoidPreAuthCompletion:
-		trxn.processingCode = "000000"
+		trxn.processingCode = "00000"
 	case KindVoid:
-		trxn.processingCode = "000000"
+		trxn.processingCode = "00000"
 	case KindAdjustSale:
-		trxn.processingCode = "000000"
+		trxn.processingCode = "00000"
 	default:
 		return nil, fmt.Errorf("unknow transaction type:%s", trans.OriginalTransType)
 	}
+
+	if trans.TransType == KindBatchUploadLast {
+		lastFlag = "0"
+	}
+
+	trxn.processingCode += lastFlag
+
 	return trxn, nil
 }
 

@@ -11,14 +11,14 @@ import (
 )
 
 //加密ISO8583消息
-func encryptISO8583Message(msg []byte) []byte {
-	keyV1, _ := hex.DecodeString("ABCDEF0123456789EEEEEEEEEEEEEEEE")
-	keyV2, _ := hex.DecodeString("FFFFFFFFFFFFFFFF9876543210FEDCBA")
-	var key []byte
+func encryptISO8583Message(msg []byte, key []byte) []byte {
+	// keyV1, _ := hex.DecodeString("ABCDEF0123456789EEEEEEEEEEEEEEEE")
+	// keyV2, _ := hex.DecodeString("FFFFFFFFFFFFFFFF9876543210FEDCBA")
+	// var key []byte
 
-	for i := 0; i < len(keyV1); i++ {
-		key = append(key, keyV1[i]^keyV2[i])
-	}
+	// for i := 0; i < len(keyV1); i++ {
+	// 	key = append(key, keyV1[i]^keyV2[i])
+	// }
 
 	var tripleDESKey []byte
 	tripleDESKey = append(tripleDESKey, key[:16]...)
@@ -41,7 +41,8 @@ func createIISO8583Message(fieldsMap map[uint8]string, config *Config) ([]byte, 
 	}
 	fmt.Println("un encode msg: ", hex.EncodeToString(msg))
 	fmt.Printf("\n")
-	encmsg := encryptISO8583Message(msg[10:])
+	key, _ := hex.DecodeString(config.TMK)
+	encmsg := encryptISO8583Message(msg[10:], key)
 	fmt.Println("encode msg: ", hex.EncodeToString(encmsg))
 
 	dstMsg := make([]byte, 0)
