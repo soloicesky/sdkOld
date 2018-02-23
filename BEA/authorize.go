@@ -68,6 +68,8 @@ func (auth *AuthorizeTransaction) SetFields() {
 		de22 = "80"
 	case WAVE:
 		de22 = "07"
+	case MSD:
+		de22 = "91"
 	}
 
 	if len(auth.transData.Pin) > 0 {
