@@ -88,7 +88,7 @@ func TestSales(t *testing.T) {
 		TransType:      KindSale,
 		Amount:         "00000010000",
 		TipAmount:      "1000",
-		TransId:        "000149",
+		TransId:        "000151",
 		Pan:            "5413330089020029",                  //"5413330089020029D2512201062980790"
 		CardExpireDate: "2512",                              //2212
 		Track2:         "5413330089020029D2512201062980790", // 4761739001010432D22122011631141689
@@ -221,11 +221,11 @@ func TestReversal(t *testing.T) {
 func TestSettlement(t *testing.T) {
 	fmt.Println("---------------Start TestSettlement-------------")
 	transData := &TransactionData{
-		TransType: KindSettlment,
+		TransType: KindSettlmentAfterUpload,
 		TransId:   "000139",
 		Batchtotals: &BatchTotals{
 			CapturedSalesCount:    3,
-			CapturedSalesAmount:   12300,
+			CapturedSalesAmount:   30000,
 			CapturedRefundCount:   0,
 			CapturedRefundAmount:  0,
 			DebitSalesCount:       0,
@@ -274,7 +274,7 @@ func TestBatchUpload(t *testing.T) {
 		TransId:           "000139",
 		AcquireTransID:    "180207613032",
 		OriginalTransType: KindSale,
-		Amount:            "106800",
+		Amount:            "10000",
 		AuthCode:          "005944",
 		ResponseCode:      "00",
 		Track2:            "5413330089020029D2512201062980790",
