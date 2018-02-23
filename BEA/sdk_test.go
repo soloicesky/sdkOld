@@ -327,5 +327,6 @@ func getConfig() *Config {
 		TimeOut:    120,
 		MerchantId: "000015204000099",
 		TerminalId: "63150001",
+		TMK:        "543210FEDCBA98767698BADCFE103254",
 	}
 }
