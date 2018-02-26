@@ -11,8 +11,9 @@ import (
 **/
 func BuildConstructTLVMsg(tlvmap map[string]string) []byte {
 	dstMsg := make([]byte, 0)
+
 	for k, v := range tlvmap {
-		fmt.Printf("tag:%s--val:%s", k, v)
+		// fmt.Printf("tag:%s--val:%s", k, v)
 		bt, _ := hex.DecodeString(k)
 		dstMsg = append(dstMsg, bt...)
 		val, _ := hex.DecodeString(v)
@@ -27,7 +28,7 @@ func BuildConstructTLVMsg(tlvmap map[string]string) []byte {
 			dstMsg = append(dstMsg, val...)
 		}
 	}
-	fmt.Println("dstMsg---", string(dstMsg))
+	fmt.Println("\ndstMsg\n---------------------\n", hex.EncodeToString(dstMsg), "\n---------------------------\n")
 	return dstMsg
 }
 

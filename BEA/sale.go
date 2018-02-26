@@ -7,14 +7,14 @@ import (
 	"github.com/zhulingbiezhi/sdkOld/TLV"
 )
 
-type AuthorizeTransaction struct {
+type SaleTransaction struct {
 	entryMap map[EntryMode][]uint8
 	BaseElement
 	messageTypeId  string
 	processingCode string
 }
 
-func NewAuthorize(trans *TransactionData, config *Config) (*AuthorizeTransaction, error) {
+func NewSale(trans *TransactionData, config *Config) (*SaleTransaction, error) {
 	fieldMap := map[EntryMode][]uint8{
 		INSERT:   {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 55, 62},
 		SWIPE:    {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 62},
@@ -23,41 +23,38 @@ func NewAuthorize(trans *TransactionData, config *Config) (*AuthorizeTransaction
 		MSD:      {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 62},
 		MANUAL:   {0, 2, 3, 4, 11, 14, 22, 24, 25, 41, 42, 62},
 	}
-	return &AuthorizeTransaction{
+
+	return &SaleTransaction{
 		entryMap: fieldMap,
 		BaseElement: BaseElement{
 			transData: trans,
 			config:    config,
 		},
-		messageTypeId:  "0100",
+		messageTypeId:  "0200",
 		processingCode: "000000",
 	}, nil
 }
 
-func (auth *AuthorizeTransaction) Valid() error {
-	if err := auth.baseValid(); err != nil {
+func (sale *SaleTransaction) Valid() error {
+	if err := sale.baseValid(); err != nil {
 		return err
 	}
-	return validMatch(auth.transData.Pan,
-		auth.transData.Amount,
-		auth.transData.TransId,
-		auth.transData.CardExpireDate,
-		// auth.transData.Track2,
+	return validMatch(sale.transData.Pan,
+		sale.transData.Amount,
+		sale.transData.TransId,
+		sale.transData.CardExpireDate,
+		// sale.transData.Track2,
 	)
 }
 
-func (auth *AuthorizeTransaction) Name() string {
-	return "Authorize"
-}
-
-func (auth *AuthorizeTransaction) SetFields() {
-	auth.baseFieldSet()
-	auth.set(0, auth.messageTypeId)
-	auth.set(3, auth.processingCode)
+func (sale *SaleTransaction) SetFields() {
+	sale.baseFieldSet()
+	sale.set(0, sale.messageTypeId)
+	sale.set(3, sale.processingCode)
 
 	var de22 string
 
-	switch auth.transData.PosEntryMode {
+	switch sale.transData.PosEntryMode {
 	case INSERT:
 		de22 = "05"
 	case SWIPE:
@@ -72,17 +69,17 @@ func (auth *AuthorizeTransaction) SetFields() {
 		de22 = "91"
 	}
 
-	if len(auth.transData.Pin) > 0 {
+	if len(sale.transData.Pin) > 0 {
 		de22 += "1"
 	} else {
 		de22 += "2"
 	}
 
-	auth.set(22, de22)
-	auth.set(24, param[auth.transData.TransType].nii)
-	auth.set(25, param[auth.transData.TransType].posCondictionCode)
+	sale.set(22, de22)
+	sale.set(24, param[sale.transData.TransType].nii)
+	sale.set(25, param[sale.transData.TransType].posCondictionCode)
 
-	switch auth.transData.PosEntryMode {
+	switch sale.transData.PosEntryMode {
 	case INSERT:
 		fallthrough
 	case WAVE:
@@ -90,20 +87,24 @@ func (auth *AuthorizeTransaction) SetFields() {
 
 		for _, tag := range DE55TagList {
 			// fmt.Printf("tag:%v\n", tag)
-			iccData[tag] = auth.transData.IccRelatedData[tag]
+			iccData[tag] = sale.transData.IccRelatedData[tag]
 		}
 
 		fmt.Printf("iccdata:%v\r\n", iccData)
 
 		de55 := TLV.BuildConstructTLVMsg(iccData)
-		auth.set(55, hex.EncodeToString(de55))
+		sale.set(55, hex.EncodeToString(de55))
 	default:
 	}
-	auth.set(24, param[auth.transData.TransType].nii)
-	auth.set(25, param[auth.transData.TransType].posCondictionCode)
-	auth.set(62, auth.transData.TransId)
+
+	sale.set(54, fmt.Sprintf("%012s", sale.transData.TipAmount))
+	sale.set(62, sale.transData.TransId)
 }
 
-func (auth *AuthorizeTransaction) Fields() []uint8 {
-	return auth.entryMap[auth.transData.PosEntryMode]
+func (sale *SaleTransaction) Fields() []uint8 {
+	return sale.entryMap[sale.transData.PosEntryMode]
+}
+
+func (sale *SaleTransaction) Name() string {
+	return string(sale.transData.TransType)
 }

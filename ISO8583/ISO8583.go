@@ -1,7 +1,9 @@
 package ISO8583
 
 import (
+	"encoding/hex"
 	"fmt"
+	"sort"
 	"strconv"
 )
 
@@ -144,7 +146,7 @@ func GetElement(fieldId int) (v string, err error) {
 	if OK {
 		return value, nil
 	} else {
-		return value, fmt.Errorf("can't find field:%d\r\n", fieldId)
+		return value, fmt.Errorf("can't find field:%d", fieldId)
 	}
 }
 
@@ -154,23 +156,28 @@ func GetElement(fieldId int) (v string, err error) {
 	@retval msg - 构建好的ISO8583报文
 	@retval err - 错误
 **/
-func PrepareISO8583Message(fdSets map[uint8]string) (msg []byte, err error) {
+func PrepareISO8583Message(fdSetsMap map[uint8]string) (msg []byte, err error) {
 	bitmap := make([]byte, 8)
 	vlen := 0
 	message := make([]byte, 1024)
 	offset := 0
 	bitmapOffset := 0
 
+	var keys []int
+	for k := range fdSetsMap {
+		keys = append(keys, int(k))
+	}
+	sort.Ints(keys)
+
 	//	fmt.Printf("fdSets size:%d\r\n", len(fdSets))
-
-	for id, e := range fdSets {
-		attr, ok := fieldAttr[int(id)]
-
+	for _, id := range keys {
+		attr, ok := fieldAttr[id]
+		uintId := uint8(id)
 		if !ok {
-			err = fmt.Errorf("field attr %d not found\r\n", id)
+			err = fmt.Errorf("field attr %d not found", id)
 			return nil, err
 		}
-
+		e := fdSetsMap[uintId]
 		switch attr.format {
 		case b:
 			vlen = (len(e) + 1) / 2
@@ -180,14 +187,14 @@ func PrepareISO8583Message(fdSets map[uint8]string) (msg []byte, err error) {
 
 		fmt.Printf("[id]:%d  value:%s\r\n", id, e)
 		if vlen > attr.maxLen {
-			err = fmt.Errorf("[%d]len invalid, expected:%d, in:%d\r\n", id, attr.maxLen, vlen)
+			err = fmt.Errorf("[%d]len invalid, expected:%d, in:%d", id, attr.maxLen, vlen)
 			continue
 		}
 
 		switch attr.lenType {
 		case FIX:
 			if vlen != attr.maxLen {
-				err = fmt.Errorf("[%d]len invalid, expected:%d, in:%d\r\n", id, attr.maxLen, vlen)
+				err = fmt.Errorf("[%d]len invalid, expected:%d, in:%d", id, attr.maxLen, vlen)
 				continue
 			}
 		case VARL:
@@ -209,18 +216,20 @@ func PrepareISO8583Message(fdSets map[uint8]string) (msg []byte, err error) {
 			if (len(e) % 2) != 0 {
 				e = "0" + e
 			}
-
-			copy(message[offset:], Base16Decode(e))
+			v, _ := hex.DecodeString(e)
+			copy(message[offset:], v)
 			offset += (vlen + 1) / 2
 		case Z:
 			if (len(e) % 2) != 0 {
 				e = e + "F"
 			}
 
-			copy(message[offset:], Base16Decode(e))
+			v, _ := hex.DecodeString(e)
+			copy(message[offset:], v)
 			offset += (vlen + 1) / 2
 		case b:
-			copy(message[offset:], Base16Decode(e))
+			vb, _ := hex.DecodeString(e)
+			copy(message[offset:], vb)
 			offset += vlen
 
 		case A, AN, ANS:
@@ -232,7 +241,7 @@ func PrepareISO8583Message(fdSets map[uint8]string) (msg []byte, err error) {
 		}
 
 		if id > 0 {
-			bitmap[(id-1)/8] |= 1 << ((8 - id) % 8)
+			bitmap[(uintId-1)/8] |= 1 << ((8 - uintId) % 8)
 			//fmt.Printf("bitmap:%v", bitmap)
 		}
 
@@ -242,7 +251,7 @@ func PrepareISO8583Message(fdSets map[uint8]string) (msg []byte, err error) {
 		}
 
 		//		fmt.Printf("offset:%d\r\n", offset)
-		//		fmt.Printf("message now:%s\r\n", Base16Encode(message[0:offset]))
+		//		fmt.Printf("message now:%s\r\n", hex.EncodeToString(message[0:offset]))
 	}
 
 	copy(message[bitmapOffset:bitmapOffset+8], bitmap)
@@ -273,9 +282,9 @@ func DecodeISO8583Message(msg []byte, saveData SaveElement, storage interface{})
 	var value string
 	var strlen string
 
-	fmt.Printf("msg in:%s\r\n", Base16Encode(msg))
+	fmt.Printf("msg in:%s\r\n", hex.EncodeToString(msg))
 	if len(msg) < 10 {
-		return fmt.Errorf("invalid message: %s", Base16Encode(msg))
+		return fmt.Errorf("invalid message: %s", hex.EncodeToString(msg))
 	}
 
 	message := msg[2:]
@@ -308,12 +317,12 @@ func DecodeISO8583Message(msg []byte, saveData SaveElement, storage interface{})
 					offset += 2
 				}
 
-				fmt.Printf("id:%d offset:%d-vlen:%d\r\n", id, offset, vlen)
+				//fmt.Printf("id:%d offset:%d-vlen:%d\r\n", id, offset, vlen)
 
 				switch attr.format {
 				case N, Z:
 
-					value = Base16Encode(message[offset : offset+((vlen+1)/2)])
+					value = hex.EncodeToString(message[offset : offset+((vlen+1)/2)])
 
 					if vlen%2 != 0 {
 						saveData(id, value[1:vlen+1], storage)
@@ -325,7 +334,7 @@ func DecodeISO8583Message(msg []byte, saveData SaveElement, storage interface{})
 					offset += (vlen + 1) / 2
 				case b:
 
-					value = Base16Encode(message[offset : offset+vlen])
+					value = hex.EncodeToString(message[offset : offset+vlen])
 
 					saveData(id, value, storage)
 					fieldRepo[id] = value

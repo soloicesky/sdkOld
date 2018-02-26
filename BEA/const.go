@@ -40,6 +40,8 @@ const (
 	KindAdjustRefund                   TransactionType = "ADJUSTREFUND"                   //调整退货
 	KindVoidAdjustRefund               TransactionType = "VOIDADJUSTREFUND"               //调整退货撤销
 	KindVoidUploadAdjustRefund         TransactionType = "VOIDUPLOADADJUSTREFUND"         //上送退货调整撤销
+	KindVoid                           TransactionType = "VOID"                           //撤销
+	KindInitialization                 TransactionType = "INITIALIZATION"                 //初始化
 )
 
 type EntryMode string
@@ -105,6 +107,8 @@ var param = map[TransactionType]msgParam{
 	KindAdjustRefund:                   {"0220", "220000", "028", "00"}, //退货调整
 	KindVoidAdjustRefund:               {"0220", "220000", "028", "00"}, //退货调整撤销
 	KindVoidUploadAdjustRefund:         {"0220", "220000", "028", "00"}, //退货调整上送撤销
+	KindVoid:                           {"0220", "220000", "028", "00"}, //撤销
+	KindInitialization:                 {"0800", "220000", "028", "00"}, //撤销
 }
 
 func getAllEntryModes() []EntryMode {
@@ -126,4 +130,31 @@ func getSupportEntryMode(mode EntryMode) error {
 		}
 	}
 	return fmt.Errorf("not support pos_entry_mode: %s", mode)
+}
+
+var DE55TagList = []string{
+	"57",
+	"5A",
+	"5F2A",
+	"82",
+	"84",
+	"95",
+	"9A",
+	"9B",
+	"9C",
+	"9F02",
+	"9F03",
+	"9F08",
+	"9F09",
+	"9F1A",
+	"9F1E",
+	"9F26",
+	"9F27",
+	"9F33",
+	"9F34",
+	"9F35",
+	"9F36",
+	"9F37",
+	"9F41",
+	"9F10",
 }
