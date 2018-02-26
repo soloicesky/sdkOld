@@ -10,7 +10,7 @@ import (
 	tlvmap TLV 数据集合
 **/
 func BuildConstructTLVMsg(tlvmap map[string]string) []byte {
-	dstMsg := make([]byte, 1)
+	dstMsg := make([]byte, 0)
 	for k, v := range tlvmap {
 		fmt.Printf("tag:%s--val:%s", k, v)
 		bt, _ := hex.DecodeString(k)
