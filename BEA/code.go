@@ -6,7 +6,7 @@ func (c BEACode) Code() string {
 	return string(c)
 }
 
-func (c BEACode) String() string {
+func (c BEACode) Detail() string {
 	return errorMap[c]
 }
 const (
