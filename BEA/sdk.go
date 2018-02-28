@@ -2,7 +2,6 @@ package BEA
 
 import (
 	"fmt"
-	"log"
 )
 
 func DoRequest(transData *TransactionData, config *Config) (*TransactionData, error) {
