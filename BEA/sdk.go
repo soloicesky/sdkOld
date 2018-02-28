@@ -57,6 +57,8 @@ func getTransactionInterface(transData *TransactionData, config *Config) (BEAInt
 	switch transData.TransType {
 	case KindPreAuthorize:
 		return NewAuthorize(transData, config)
+	case KindPreAuthCompletion:
+		return NewAuthCompletion(transData, config)
 	case KindSale:
 		return NewSale(transData, config)
 	case KindVoid:
