@@ -2,6 +2,7 @@ package BEA
 
 import (
 	"fmt"
+	"log"
 )
 
 func DoRequest(transData *TransactionData, config *Config) (*TransactionData, error) {
@@ -32,7 +33,8 @@ func DoRequest(transData *TransactionData, config *Config) (*TransactionData, er
 	for _, id := range fields {
 		val := fieldsMap[id]
 		if val == "" {
-			return nil, fmt.Errorf("the TransactionInterface %s of field %d is empty", txnInter.Name(), id)
+			fmt.Println("warning: the TransactionInterface %s of field %d is empty", txnInter.Name(), id)
+			//return nil, fmt.Errorf("the TransactionInterface %s of field %d is empty", txnInter.Name(), id)
 		} else {
 			finalMap[id] = val
 		}
