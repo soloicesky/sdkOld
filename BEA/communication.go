@@ -127,15 +127,15 @@ func communicateWithHost(transData *TransactionData, config *Config, fieldsMap m
 		}
 		rrn := RandomStr(RandomStrTypeNumber, 12)
 		transData.AcquireTransID = rrn
-		authCode := RandomStr(RandomStrTypeNumber, 6)
-		transData.AuthCode = authCode
+		//authCode := RandomStr(RandomStrTypeNumber, 6)
+		transData.AuthCode = "111111"
 	case "63150003": //帐平
 		fmt.Println("test enviroment 2")
 		transData.ResponseCode = "00"
 		rrn := RandomStr(RandomStrTypeNumber, 12)
 		transData.AcquireTransID = rrn
-		authCode := RandomStr(RandomStrTypeNumber, 6)
-		transData.AuthCode = authCode
+		//authCode := RandomStr(RandomStrTypeNumber, 6)
+		transData.AuthCode = "111111"
 	}
 
 	return transData, nil
