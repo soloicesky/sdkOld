@@ -92,6 +92,7 @@ func TestSales(t *testing.T) {
 		Pan:            "5413330089020029",                  //"5413330089020029D2512201062980790"
 		CardExpireDate: "2512",                              //2212
 		Track2:         "5413330089020029D2512201062980790", // 4761739001010432D22122011631141689
+		BatchNumber:    "20",
 		PosEntryMode:   SWIPE,
 		IccRelatedData: VISIccRelatedData,
 	}

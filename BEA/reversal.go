@@ -16,12 +16,12 @@ type ReversalTransaction struct {
 
 func NewReversal(trans *TransactionData, config *Config) (*ReversalTransaction, error) {
 	fieldMap := map[EntryMode][]uint8{
-		INSERT:   {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 55, 62},
-		SWIPE:    {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 62},
-		WAVE:     {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 55, 62},
-		FALLBACK: {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 62},
-		MSD:      {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 62},
-		MANUAL:   {0, 2, 3, 4, 11, 14, 22, 24, 25, 41, 42, 62},
+		INSERT:   {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 55, 60, 62},
+		SWIPE:    {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 60, 62},
+		WAVE:     {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 55, 60, 62},
+		FALLBACK: {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 60, 62},
+		MSD:      {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 60, 62},
+		MANUAL:   {0, 2, 3, 4, 11, 14, 22, 24, 25, 41, 42, 60, 62},
 	}
 
 	txn := &ReversalTransaction{
@@ -111,6 +111,8 @@ func (reversal *ReversalTransaction) SetFields() {
 	default:
 	}
 
+	batchno := fmt.Sprintf("%06s", reversal.transData.BatchNumber)
+	reversal.set(60, batchno)
 	reversal.set(62, reversal.transData.TransId)
 }
 

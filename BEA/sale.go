@@ -16,12 +16,12 @@ type SaleTransaction struct {
 
 func NewSale(trans *TransactionData, config *Config) (*SaleTransaction, error) {
 	fieldMap := map[EntryMode][]uint8{
-		INSERT:   {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 55, 62},
-		SWIPE:    {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 62},
-		WAVE:     {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 55, 62},
-		FALLBACK: {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 62},
-		MSD:      {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 62},
-		MANUAL:   {0, 2, 3, 4, 11, 14, 22, 24, 25, 41, 42, 62},
+		INSERT:   {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 55, 60, 62},
+		SWIPE:    {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 60, 62},
+		WAVE:     {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 55, 60, 62},
+		FALLBACK: {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 60, 62},
+		MSD:      {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 60, 62},
+		MANUAL:   {0, 2, 3, 4, 11, 14, 22, 24, 25, 41, 42, 60, 62},
 	}
 
 	return &SaleTransaction{
@@ -98,6 +98,9 @@ func (sale *SaleTransaction) SetFields() {
 	}
 
 	sale.set(54, fmt.Sprintf("%012s", sale.transData.TipAmount))
+
+	batchno := fmt.Sprintf("%06s", sale.transData.BatchNumber)
+	sale.set(60, batchno)
 	sale.set(62, sale.transData.TransId)
 }
 

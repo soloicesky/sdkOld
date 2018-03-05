@@ -16,12 +16,12 @@ type RefundTransaction struct {
 
 func NewRefund(trans *TransactionData, config *Config) (*RefundTransaction, error) {
 	fieldMap := map[EntryMode][]uint8{
-		INSERT:   {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 55, 62},
-		SWIPE:    {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 62},
-		WAVE:     {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 55, 62},
-		FALLBACK: {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 62},
-		MSD:      {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 62},
-		MANUAL:   {0, 2, 3, 4, 11, 14, 22, 24, 25, 41, 42, 62},
+		INSERT:   {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 55, 60, 62},
+		SWIPE:    {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 60, 62},
+		WAVE:     {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 55, 60, 62},
+		FALLBACK: {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 60, 62},
+		MSD:      {0, 2, 3, 4, 11, 14, 22, 24, 25, 35, 41, 42, 60, 62},
+		MANUAL:   {0, 2, 3, 4, 11, 14, 22, 24, 25, 41, 42, 60, 62},
 	}
 	return &RefundTransaction{
 		entryMap: fieldMap,
@@ -94,6 +94,8 @@ func (refund *RefundTransaction) SetFields() {
 	default:
 	}
 
+	batchno := fmt.Sprintf("%06s", refund.transData.BatchNumber)
+	refund.set(60, batchno)
 	refund.set(62, refund.transData.TransId)
 
 }
