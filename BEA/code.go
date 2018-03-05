@@ -2,10 +2,13 @@ package BEA
 
 type BEACode string
 
-func (err BEACode) String() string {
-	return errorMap[err]
+func (c BEACode) Code() string {
+	return string(c)
 }
 
+func (c BEACode) Detail() string {
+	return errorMap[c]
+}
 const (
 	APPROVED                       BEACode = "00" //交易批准
 	CALL_ISSUER                    BEACode = "01" //请联系放卡行

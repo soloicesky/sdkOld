@@ -89,13 +89,14 @@ func communicateWithHost(transData *TransactionData, config *Config, fieldsMap m
 	default:
 		fallthrough
 	case "63150001":
+		fmt.Println("bea enviroment")
 		switch transData.TransType {
-		case KindReversal:
-			transData.ResponseCode = "00"
-			rrn := RandomStr(RandomStrTypeNumber, 12)
-			transData.AcquireTransID = rrn
-			authCode := RandomStr(RandomStrTypeNumber, 6)
-			transData.AuthCode = authCode
+		//case KindReversal:
+		//	transData.ResponseCode = "00"
+		//	rrn := RandomStr(RandomStrTypeNumber, 12)
+		//	transData.AcquireTransID = rrn
+		//	authCode := RandomStr(RandomStrTypeNumber, 6)
+		//	transData.AuthCode = authCode
 		default:
 			msg, err := createIISO8583Message(fieldsMap, config)
 			if err != nil {
@@ -117,6 +118,7 @@ func communicateWithHost(transData *TransactionData, config *Config, fieldsMap m
 		}
 
 	case "63150002": //帐不平
+		fmt.Println("test enviroment 1")
 		switch transData.TransType {
 		case KindSettlment:
 			transData.ResponseCode = "95"
@@ -125,14 +127,15 @@ func communicateWithHost(transData *TransactionData, config *Config, fieldsMap m
 		}
 		rrn := RandomStr(RandomStrTypeNumber, 12)
 		transData.AcquireTransID = rrn
-		authCode := RandomStr(RandomStrTypeNumber, 6)
-		transData.AuthCode = authCode
+		//authCode := RandomStr(RandomStrTypeNumber, 6)
+		transData.AuthCode = "111111"
 	case "63150003": //帐平
+		fmt.Println("test enviroment 2")
 		transData.ResponseCode = "00"
 		rrn := RandomStr(RandomStrTypeNumber, 12)
 		transData.AcquireTransID = rrn
-		authCode := RandomStr(RandomStrTypeNumber, 6)
-		transData.AuthCode = authCode
+		//authCode := RandomStr(RandomStrTypeNumber, 6)
+		transData.AuthCode = "111111"
 	}
 
 	return transData, nil

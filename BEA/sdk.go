@@ -32,7 +32,8 @@ func DoRequest(transData *TransactionData, config *Config) (*TransactionData, er
 	for _, id := range fields {
 		val := fieldsMap[id]
 		if val == "" {
-			return nil, fmt.Errorf("the TransactionInterface %s of field %d is empty", txnInter.Name(), id)
+			fmt.Println("warning: the TransactionInterface %s of field %d is empty", txnInter.Name(), id)
+			//return nil, fmt.Errorf("the TransactionInterface %s of field %d is empty", txnInter.Name(), id)
 		} else {
 			finalMap[id] = val
 		}
@@ -57,6 +58,8 @@ func getTransactionInterface(transData *TransactionData, config *Config) (BEAInt
 	switch transData.TransType {
 	case KindPreAuthorize:
 		return NewAuthorize(transData, config)
+	case KindPreAuthCompletion:
+		return NewAuthCompletion(transData, config)
 	case KindSale:
 		return NewSale(transData, config)
 	case KindVoid:
